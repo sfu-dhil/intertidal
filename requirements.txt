@@ -1,0 +1,18 @@
+# Django
+Django==5.1.3
+django-admin-interface==0.29.1
+django-health-check==3.18.3
+django-cleanup==8.1.0
+django-partial-date==1.3.2
+django-nested-admin==4.1.0
+django-select2==8.2.1
+
+# Environment variables
+django-environ==0.11.2
+python-dotenv==1.0.1
+
+# prod server
+gunicorn==23.0.0
+
+# Dataabse (psycopg[binary] cannot be locked to specific version number)
+psycopg[binary]
