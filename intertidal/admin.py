@@ -34,7 +34,7 @@ class PersonResponsibilityStatementInline(NestedGenericTabularInline):
     }
 
     def note(self, obj):
-        return mark_safe('See the list of <a class="text-primary-500" href="https://www.loc.gov/marc/relators/relaterm.html" target="_blank">MARC Relators</a> for descriptions of each responsibility')
+        return mark_safe('See the list of <u><a href="https://www.loc.gov/marc/relators/relaterm.html" target="_blank">MARC Relators</a></u> for descriptions of each responsibility')
 
 class OrganizationResponsibilityStatementInline(NestedGenericTabularInline):
     fields = ['organization', 'marc_relators', 'note']
@@ -56,7 +56,7 @@ class OrganizationResponsibilityStatementInline(NestedGenericTabularInline):
     }
 
     def note(self, obj):
-        return mark_safe('See the list of <a class="text-primary-500" href="https://www.loc.gov/marc/relators/relaterm.html" target="_blank">MARC Relators</a> for descriptions of each responsibility/role')
+        return mark_safe('See the list of <u><a href="https://www.loc.gov/marc/relators/relaterm.html" target="_blank">MARC Relators</a></u> for descriptions of each responsibility/role')
 
 class EditionInlineAdmin(NestedTabularInline):
     fields = ['date', 'name', 'translation', 'translation_language']

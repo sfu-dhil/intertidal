@@ -20,6 +20,10 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
+admin.site.site_header = "Intertidal"
+admin.site.site_title = "Intertidal"
+admin.site.index_title = "Welcome to the Intertidal admin interface"
+
 urlpatterns = [
     # health check ping endpoint
     path('health_check/', include('health_check.urls')),

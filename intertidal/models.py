@@ -163,7 +163,7 @@ class Resource(models.Model):
     alternative_names = ArrayField(models.CharField(), default=list, blank=True, verbose_name='Alternative Names/Titles')
     forms = ArrayField(
         models.CharField(choices=ClsTypes.choices), default=list, blank=True, verbose_name='Physical/Digital Forms',
-        help_text=mark_safe('See the list of <a href="https://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types" target="_blank">Citation Style Language Types</a> for descriptions of each form')
+        help_text=mark_safe('See the list of <u><a href="https://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types" target="_blank">Citation Style Language Types</a></u> for descriptions of each form')
     )
     genres = ArrayField(models.CharField(), default=list, blank=True)
     keywords = ArrayField(models.CharField(), default=list, blank=True)

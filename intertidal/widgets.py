@@ -43,7 +43,7 @@ class Select2TagArrayWidget(Select2AdminMixin, Select2TagWidget):
         default_attrs = {
             "data-allow-clear": False,
             "data-token-separators": '|',
-            "data-width": '800px',
+            "data-width": '500px',
         }
         default_attrs.update(base_attrs)
         return super().build_attrs(default_attrs, extra_attrs=extra_attrs)
@@ -64,7 +64,7 @@ class Select2ChoiceArrayWidget(Select2AdminMixin, Select2MultipleWidget):
             "data-allow-clear": False,
             "data-minimum-input-length": 0,
             "data-token-separators": '[",", " "]',
-            "data-width": '800px',
+            "data-width": '500px',
         }
         default_attrs.update(base_attrs)
         return super().build_attrs(default_attrs, extra_attrs=extra_attrs)
