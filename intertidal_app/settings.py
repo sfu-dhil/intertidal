@@ -46,10 +46,11 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 # Application definition
 
 INSTALLED_APPS = [
+    'intertidal.apps.IntertidalConfig',
     'admin_interface',
     'colorfield',
+    'tinymce',
     'nested_admin',
-    'intertidal.apps.IntertidalConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     'health_check',
     'django_select2',
     'django_cleanup.apps.CleanupConfig',
+    'admin_async_upload',
 ]
 
 MIDDLEWARE = [
@@ -184,3 +186,15 @@ LOGOUT_REDIRECT_URL = 'admin:login'
 
 # admin interface
 warnings.filterwarnings("ignore", module="admin_interface.templatetags.admin_interface_tags")
+
+# tinymce settings
+TINYMCE_DEFAULT_CONFIG = {
+    'height': '250px',
+    'branding': False,
+    'menubar': False,
+    'plugins': 'autolink, code, link, anchor, lists, table, quickbars, wordcount, pagebreak, nonbreaking',
+    'toolbar': 'undo redo | numlist bullist | fontsize | alignleft aligncenter alignright | link anchor | hr | removeformat',
+    'quickbars_insert_toolbar': False,
+    'quickbars_selection_toolbar': 'bold italic underline strikethrough | fontsize | forecolor | blockquote',
+    'contextmenu': 'undo redo | inserttable | cell row column deletetable',
+}

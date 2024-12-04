@@ -19,6 +19,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 admin.site.site_header = "Intertidal"
 admin.site.site_title = "Intertidal"
@@ -27,6 +28,8 @@ admin.site.index_title = "Welcome to the Intertidal admin interface"
 urlpatterns = [
     # health check ping endpoint
     path('health_check/', include('health_check.urls')),
+
+    path('admin/intertidal/docs/', RedirectView.as_view(url='https://docs.google.com/document/d/1rdIxTGYmmRXUBOzfq9iDxV7NHDBcxJabx-HcYqvlqYU/edit'), name='django-admindocs-docroot'),
 
     # admin password reset endpoints (from https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#adding-a-password-reset-feature)
     path("admin/password_reset/", auth_views.PasswordResetView.as_view(), name="admin_password_reset"),
@@ -38,6 +41,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path("select2/", include("django_select2.urls")),
+
+    # django-async-upload endpoints
+    path('admin_async_upload/', include("admin_async_upload.urls")),
+
+    # tinymce urls
+    path('tinymce/', include('tinymce.urls')),
 
     # public facing exhibit
     path('', include("intertidal.urls")),

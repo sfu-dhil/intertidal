@@ -8,7 +8,8 @@ from django.conf.global_settings import LANGUAGES
 from intertidal.marc_relators import MarcRelator
 from intertidal.cls_types import ClsTypes
 from django.utils.safestring import mark_safe
-
+from admin_async_upload.models import AsyncFileField
+from django_advance_thumbnail import AdvanceThumbnailField
 
 class SimpleArrayFieldSelect2Fix(SimpleArrayField):
     def prepare_value(self, value):
@@ -30,10 +31,12 @@ class ArrayField(DjangoArrayField):
 
 class Person(models.Model):
     # fields
-    name = models.CharField(db_index=True)
+    fullname = models.CharField(db_index=True)
+    citation_key = models.CharField(db_index=True, blank=True)
     alternative_names = ArrayField(models.CharField(), default=list, blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
     emails = ArrayField(models.CharField(), default=list, blank=True)
+    bio = models.TextField(blank=True)
 
     # relationships
     # one-to-many responsibility_statements via PersonResponsibilityStatement Model
@@ -50,7 +53,8 @@ class Person(models.Model):
         return alternative_names[:75] + '...' if alternative_names and len(alternative_names) >= 75 else alternative_names
 
     def __str__(self):
-        return f"{self.name} ({self.get_alternative_names_short()})" if self.get_alternative_names_short() else self.name
+        name = self.citation_key if self.citation_key else self.fullname
+        return f"{name}  ({self.get_alternative_names_short()})" if self.get_alternative_names_short() else name
 
 class Organization(models.Model):
     # fields
@@ -140,7 +144,7 @@ class Resource(models.Model):
         SINGAPORE = "SINGAPORE", "Singapore"
         HONG_KONG = "HONG_KONG", "Hong Kong"
 
-    class DisplayTypes(models.TextChoices):
+    class CategoryTypes(models.TextChoices):
         LITERARY_WORK = "LITERARY_WORK", "Literary Work"
         ART_PERFORMANCE = "ART_PERFORMANCE", "Art/Performance"
         STATE_ARCHITECTURE_MISC = "STATE_ARCHITECTURE_MISC", "State/Architecture/Misc."
@@ -154,13 +158,18 @@ class Resource(models.Model):
         default=LocaleTypes.VANCOUVER,
         db_index=True,
     )
-    display_category = models.CharField(
-        choices=DisplayTypes.choices,
-        default=DisplayTypes.LITERARY_WORK,
+    categories = ArrayField(
+        models.CharField(choices=CategoryTypes.choices),
+        default=list,
         db_index=True,
     )
     name = models.CharField(db_index=True, verbose_name='Name/Title')
     alternative_names = ArrayField(models.CharField(), default=list, blank=True, verbose_name='Alternative Names/Titles')
+    language = models.CharField(
+        choices=LANGUAGES,
+        default='en',
+        blank=True,
+    )
     forms = ArrayField(
         models.CharField(choices=ClsTypes.choices), default=list, blank=True, verbose_name='Physical/Digital Forms',
         help_text=mark_safe('See the list of <u><a href="https://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types" target="_blank">Citation Style Language Types</a></u> for descriptions of each form')
@@ -209,13 +218,6 @@ class Resource(models.Model):
 class Edition(models.Model):
     # fields
     name = models.CharField(verbose_name='Name/Title', blank=True)
-    translation = models.BooleanField(default=False)
-    translation_language = models.CharField(
-        choices=LANGUAGES,
-        default='en',
-        blank=True,
-        verbose_name='language',
-    )
     date = PartialDateField(null=True, blank=True, db_index=True)
 
     # relationships
@@ -254,7 +256,7 @@ class Occurrence(models.Model):
     resource = models.ForeignKey(
         Resource,
         related_name='occurrences',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     person_responsibility_statements = GenericRelation(
         PersonResponsibilityStatement,
@@ -271,6 +273,9 @@ class Occurrence(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Special Occurrence"
+
     def date_str(self):
         if not self.date:
             return None
@@ -282,3 +287,57 @@ class Occurrence(models.Model):
 
     def __str__(self):
         return f"{self.location} ({self.date_str()})" if self.date_str() else self.location
+
+class ResourceAudio(models.Model):
+    audio = AsyncFileField(
+        upload_to='audio/',
+        null=True,
+        blank=True,
+        help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), WAV (.wav), or Ogg (.ogg) are recommended.'),
+    )
+
+    # write tracking fields
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    # relationships
+    resource = models.ForeignKey(
+        Resource,
+        related_name='audios',
+        on_delete=models.CASCADE,
+    )
+
+class ResourceImage(models.Model):
+    image = models.ImageField(
+        upload_to='images/',
+        width_field='image_width',
+        height_field='image_height',
+        help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types" target="_blank">standard web image types</a></u>. PNG, JPEG, and WebP are recommended.'),
+    )
+    image_width = models.IntegerField(
+        null=True,
+        blank=True,
+    )
+    image_height = models.IntegerField(
+        null=True,
+        blank=True,
+    )
+
+    thumbnail = AdvanceThumbnailField(
+        source_field='image',
+        upload_to='thumbnails/',
+        null=True,
+        blank=True,
+        size=(520, 520),
+    )
+
+    # write tracking fields
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    # relationships
+    resource = models.ForeignKey(
+        Resource,
+        related_name='images',
+        on_delete=models.CASCADE,
+    )

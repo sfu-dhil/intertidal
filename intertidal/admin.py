@@ -1,13 +1,16 @@
 from django.contrib import admin
 from partial_date import PartialDateField
+from django.db.models import TextField
 from django.contrib.postgres.fields import ArrayField
 from nested_admin.nested import NestedModelAdmin, NestedTabularInline, NestedGenericTabularInline
 from datetime import datetime
 from django.utils.safestring import mark_safe
+from tinymce.widgets import TinyMCE
 
 from intertidal.models import Resource, Edition, Occurrence, \
     PersonResponsibilityStatement, Person, \
-    OrganizationResponsibilityStatement, Organization
+    OrganizationResponsibilityStatement, Organization, \
+    ResourceImage, ResourceAudio
 from intertidal.widgets import PartialDateWidget, Select2ChoiceArrayWidget, Select2TagArrayWidget
 from intertidal.marc_relators import MarcRelator
 from intertidal.cls_types import ClsTypes
@@ -59,7 +62,7 @@ class OrganizationResponsibilityStatementInline(NestedGenericTabularInline):
         return mark_safe('See the list of <u><a href="https://www.loc.gov/marc/relators/relaterm.html" target="_blank">MARC Relators</a></u> for descriptions of each responsibility/role')
 
 class EditionInlineAdmin(NestedTabularInline):
-    fields = ['date', 'name', 'translation', 'translation_language']
+    fields = ['date', 'name']
     ordering = ['id']
     model = Edition
     extra = 0
@@ -95,17 +98,36 @@ class OccurrenceInlineAdmin(NestedTabularInline):
         OrganizationResponsibilityStatementInline,
     ]
 
+class ResourceImageInlineAdmin(NestedTabularInline):
+    fields = ['image']
+    ordering = ['id']
+    model = ResourceImage
+    extra = 0
+    classes = ['collapse']
+
+class ResourceAudioInlineAdmin(NestedTabularInline):
+    fields = ['audio']
+    ordering = ['id']
+    model = ResourceAudio
+    extra = 0
+    classes = ['collapse']
+
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     fields = [
-        ('name', 'alternative_names'),
+        ('fullname', 'citation_key'),
+        'alternative_names',
         'links',
         'emails',
+        'bio',
     ]
-    list_display = ('id', 'name', 'alternative_names')
-    list_display_links = ('id', 'name', 'alternative_names')
-    ordering = ['id']
-    search_fields = ['name', 'alternative_names']
+    list_display = ('id', 'fullname', 'citation_key', 'alternative_names')
+    list_display_links = ('id', 'fullname', 'citation_key', 'alternative_names')
+    ordering = ['id', 'fullname', 'citation_key']
+    search_fields = ['fullname', 'citation_key', 'alternative_names']
+    formfield_overrides = {
+        TextField: {'widget': TinyMCE},
+    }
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'alternative_names':
@@ -133,7 +155,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     ]
     list_display = ('id', 'name', 'alternative_names')
     list_display_links = ('id', 'name', 'alternative_names')
-    ordering = ['id']
+    ordering = ['id', 'name']
     search_fields = ['name', 'alternative_names']
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -156,9 +178,10 @@ class ResourceAdmin(NestedModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('locale', 'display_category'),
+                ('locale', 'language'),
                 ('name', 'alternative_names'),
                 ('date', 'date_end', 'date_current'),
+                'categories',
                 'forms',
                 'genres',
                 'keywords',
@@ -170,13 +193,16 @@ class ResourceAdmin(NestedModelAdmin):
             'fields': ('description', 'notes'),
         }),
     )
-    list_display = ('id', 'locale', 'display_category', 'name', 'alternative_names', 'date')
-    list_display_links = ('id', 'locale', 'display_category', 'name', 'alternative_names', 'date')
-    ordering = ['locale', 'display_category', 'name']
-    search_fields = ['locale', 'display_category', 'name', 'alternative_names']
+    list_display = ('id', 'locale', 'language', 'name', 'alternative_names', 'date')
+    list_display_links = ('id', 'locale', 'language', 'name', 'alternative_names', 'date')
+    ordering = ['locale', 'name']
+    search_fields = ['locale', 'language', 'name', 'alternative_names']
     formfield_overrides = {
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
+        },
+        TextField: {
+            'widget': TinyMCE
         }
     }
     inlines = [
@@ -184,10 +210,19 @@ class ResourceAdmin(NestedModelAdmin):
         OrganizationResponsibilityStatementInline,
         EditionInlineAdmin,
         OccurrenceInlineAdmin,
+        ResourceImageInlineAdmin,
+        ResourceAudioInlineAdmin,
     ]
 
     def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name == 'alternative_names':
+        if db_field.name == 'categories':
+            kwargs['widget'] = Select2ChoiceArrayWidget(
+                attrs={
+                    'data-placeholder': 'Click to select one or more category',
+                },
+                choices=Resource.CategoryTypes.choices,
+            )
+        elif db_field.name == 'alternative_names':
             kwargs['widget'] = Select2TagArrayWidget(attrs={
                 'data-placeholder': 'Click to add one or more alternative names',
             })
