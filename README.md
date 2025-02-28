@@ -66,7 +66,7 @@ example:
 
 Command line:
 
-    docker exec -it intertidal_db mysql -u intertidal -ppassword intertidal
+    PGPASSWORD=password psql docker exec -it intertidal_db --username=intertidal intertidal
 
 Through a database management tool:
 - Host:`127.0.0.1`
