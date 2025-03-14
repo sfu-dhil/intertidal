@@ -110,3 +110,33 @@ Edit version number in `requirements.txt` with new locked version number
     docker exec -it intertidal_app pip install -r requirements.txt
     # or
     docker compose up -d --build
+
+## Upgrade Postgres Docker version
+
+First turn off everything
+
+    docker compose down
+
+Then backup the postgres data folder
+
+    cp -R .data/postgres .data/postgres-backup
+
+Finally run a handy docker image [pgautoupgrade](https://github.com/pgautoupgrade/docker-pgautoupgrade) for upgrading postgres (match postgres version and make sure to use bookworm to match default postgres linux)
+
+    docker run --rm -it \
+        -v ${PWD}/.data/postgres:/var/lib/postgresql/data/pgdata \
+        -e POSTGRES_USER=<POSTGRES_USER> \
+        -e POSTGRES_PASSWORD=<POSTGRES_PASSWORD> \
+        -e PGDATA=/var/lib/postgresql/data/pgdata \
+        -e PGAUTO_ONESHOT=yes \
+        pgautoupgrade/pgautoupgrade:{VERSION-HERE}-bookworm
+
+example:
+
+    docker run --rm -it \
+        -v ${PWD}/.data/postgres:/var/lib/postgresql/data/pgdata \
+        -e POSTGRES_USER=intertidal \
+        -e POSTGRES_PASSWORD=password \
+        -e PGDATA=/var/lib/postgresql/data/pgdata \
+        -e PGAUTO_ONESHOT=yes \
+        pgautoupgrade/pgautoupgrade:17-bookworm
