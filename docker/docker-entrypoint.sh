@@ -3,6 +3,7 @@ set -e
 
 # app specific setup here
 python manage.py migrate
+python manage.py remove_stale_contenttypes --include-stale-apps --noinput
 
 mkdir -p /app/static
 chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /app/static
