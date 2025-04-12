@@ -189,7 +189,7 @@ warnings.filterwarnings("ignore", module="admin_interface.templatetags.admin_int
 
 # tinymce settings
 TINYMCE_DEFAULT_CONFIG = {
-    'height': '250px',
+    'height': '200px',
     'branding': False,
     'menubar': False,
     'plugins': 'autolink, code, link, anchor, lists, table, quickbars, wordcount, pagebreak, nonbreaking',

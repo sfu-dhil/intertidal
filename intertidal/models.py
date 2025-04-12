@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField as DjangoArrayField
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
@@ -10,17 +10,17 @@ from intertidal.cls_types import ClsTypes
 from django.utils.safestring import mark_safe
 from admin_async_upload.models import AsyncFileField
 from django_advance_thumbnail import AdvanceThumbnailField
+from django.core.exceptions import ValidationError
 
 class SimpleArrayFieldSelect2Fix(SimpleArrayField):
     def prepare_value(self, value):
         if isinstance(value, list):
-            return '|'.join(
-                str(self.base_field.prepare_value(v)) for v in value
+            return self.delimiter.join(
+                str(f'"{self.base_field.prepare_value(v)}"') for v in value
             )
         return value
 
-
-class ArrayField(DjangoArrayField):
+class AlternativeNamesArrayField(ArrayField):
     def formfield(self, **kwargs):
         defaults = {
             'form_class': SimpleArrayFieldSelect2Fix,
@@ -33,7 +33,7 @@ class Person(models.Model):
     # fields
     fullname = models.CharField(db_index=True)
     citation_key = models.CharField(db_index=True, blank=True)
-    alternative_names = ArrayField(models.CharField(), default=list, blank=True)
+    alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
     emails = ArrayField(models.CharField(), default=list, blank=True)
     bio = models.TextField(blank=True)
@@ -59,7 +59,7 @@ class Person(models.Model):
 class Organization(models.Model):
     # fields
     name = models.CharField(db_index=True)
-    alternative_names = ArrayField(models.CharField(), default=list, blank=True)
+    alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True)
     address = models.CharField(blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
     emails = ArrayField(models.CharField(), default=list, blank=True)
@@ -164,7 +164,7 @@ class Resource(models.Model):
         db_index=True,
     )
     name = models.CharField(db_index=True, verbose_name='Name/Title')
-    alternative_names = ArrayField(models.CharField(), default=list, blank=True, verbose_name='Alternative Names/Titles')
+    alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True, verbose_name='Alternative Names/Titles')
     language = models.CharField(
         choices=LANGUAGES,
         default='en',

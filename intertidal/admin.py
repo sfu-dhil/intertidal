@@ -11,7 +11,7 @@ from intertidal.models import Resource, Edition, Occurrence, \
     PersonResponsibilityStatement, Person, \
     OrganizationResponsibilityStatement, Organization, \
     ResourceImage, ResourceAudio
-from intertidal.widgets import PartialDateWidget, Select2ChoiceArrayWidget, Select2TagArrayWidget
+from intertidal.widgets import PartialDateWidget, Select2ChoiceArrayWidget, Select2TagArrayWidget, Select2TagWithCommaArrayWidget
 from intertidal.marc_relators import MarcRelator
 from intertidal.cls_types import ClsTypes
 
@@ -121,9 +121,9 @@ class PersonAdmin(admin.ModelAdmin):
         'emails',
         'bio',
     ]
-    list_display = ('id', 'fullname', 'citation_key', 'alternative_names')
-    list_display_links = ('id', 'fullname', 'citation_key', 'alternative_names')
-    ordering = ['id', 'fullname', 'citation_key']
+    list_display = ('fullname', 'citation_key', 'alternative_names')
+    list_display_links = ('fullname', 'citation_key', 'alternative_names')
+    ordering = ['fullname', 'citation_key']
     search_fields = ['fullname', 'citation_key', 'alternative_names']
     formfield_overrides = {
         TextField: {'widget': TinyMCE},
@@ -131,7 +131,7 @@ class PersonAdmin(admin.ModelAdmin):
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'alternative_names':
-            kwargs['widget'] = Select2TagArrayWidget(attrs={
+            kwargs['widget'] = Select2TagWithCommaArrayWidget(attrs={
                 'data-placeholder': 'Click to add one or more alternative names',
             })
         elif db_field.name == 'links':
@@ -153,14 +153,14 @@ class OrganizationAdmin(admin.ModelAdmin):
         'links',
         'emails',
     ]
-    list_display = ('id', 'name', 'alternative_names')
-    list_display_links = ('id', 'name', 'alternative_names')
-    ordering = ['id', 'name']
+    list_display = ('name', 'alternative_names')
+    list_display_links = ('name', 'alternative_names')
+    ordering = ['name']
     search_fields = ['name', 'alternative_names']
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'alternative_names':
-            kwargs['widget'] = Select2TagArrayWidget(attrs={
+            kwargs['widget'] = Select2TagWithCommaArrayWidget(attrs={
                 'data-placeholder': 'Click to add one or more alternative names',
             })
         elif db_field.name == 'links':
@@ -172,6 +172,60 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'data-placeholder': 'Click to add one or more emails',
             })
         return super().formfield_for_dbfield(db_field, **kwargs)
+
+class CategoriesListFilter(admin.SimpleListFilter):
+    title = "categories"
+    parameter_name = "categories"
+
+    def lookups(self, request, model_admin):
+        return Resource.CategoryTypes.choices
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(categories__contains=[self.value()])
+
+class FormsListFilter(admin.SimpleListFilter):
+    title = "Forms"
+    parameter_name = "forms"
+
+    def lookups(self, request, model_admin):
+        return ClsTypes.choices
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(forms__contains=[self.value()])
+
+class GenresListFilter(admin.SimpleListFilter):
+    title = "genres"
+    parameter_name = "genres"
+
+    def lookups(self, request, model_admin):
+        genres = [
+            g
+            for subgroup in Resource.objects.values_list('genres', flat=True)
+            for g in subgroup
+        ]
+        return [(g, g) for g in set(genres)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(genres__contains=[self.value()])
+
+class KeywordsListFilter(admin.SimpleListFilter):
+    title = "keywords"
+    parameter_name = "keywords"
+
+    def lookups(self, request, model_admin):
+        keywords = [
+            kw
+            for subgroup in Resource.objects.values_list('keywords', flat=True)
+            for kw in subgroup
+        ]
+        return [(kw, kw) for kw in set(keywords)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(keywords__contains=[self.value()])
 
 @admin.register(Resource)
 class ResourceAdmin(NestedModelAdmin):
@@ -189,14 +243,15 @@ class ResourceAdmin(NestedModelAdmin):
             )
         }),
         ('Description/Notes', {
-            'classes': ('collapse',),
+            'classes': ['collapse'],
             'fields': ('description', 'notes'),
         }),
     )
-    list_display = ('id', 'locale', 'language', 'name', 'alternative_names', 'date')
-    list_display_links = ('id', 'locale', 'language', 'name', 'alternative_names', 'date')
+    list_filter = ['locale', 'language', CategoriesListFilter, FormsListFilter, GenresListFilter, KeywordsListFilter]
+    list_display = ('name', 'alternative_names', 'date')
+    list_display_links = ('name', 'alternative_names', 'date')
     ordering = ['locale', 'name']
-    search_fields = ['locale', 'language', 'name', 'alternative_names']
+    search_fields = ['name', 'alternative_names']
     formfield_overrides = {
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
@@ -223,7 +278,7 @@ class ResourceAdmin(NestedModelAdmin):
                 choices=Resource.CategoryTypes.choices,
             )
         elif db_field.name == 'alternative_names':
-            kwargs['widget'] = Select2TagArrayWidget(attrs={
+            kwargs['widget'] = Select2TagWithCommaArrayWidget(attrs={
                 'data-placeholder': 'Click to add one or more alternative names',
             })
         elif db_field.name == 'forms':
