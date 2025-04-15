@@ -118,7 +118,6 @@ class PersonAdmin(admin.ModelAdmin):
         ('fullname', 'citation_key'),
         'alternative_names',
         'links',
-        'emails',
         'bio',
     ]
     list_display = ('fullname', 'citation_key', 'alternative_names')
@@ -151,7 +150,6 @@ class OrganizationAdmin(admin.ModelAdmin):
         ('name', 'alternative_names'),
         'address',
         'links',
-        'emails',
     ]
     list_display = ('name', 'alternative_names')
     list_display_links = ('name', 'alternative_names')
@@ -195,22 +193,6 @@ class FormsListFilter(admin.SimpleListFilter):
         if self.value():
             return queryset.filter(forms__contains=[self.value()])
 
-class GenresListFilter(admin.SimpleListFilter):
-    title = "genres"
-    parameter_name = "genres"
-
-    def lookups(self, request, model_admin):
-        genres = [
-            g
-            for subgroup in Resource.objects.values_list('genres', flat=True)
-            for g in subgroup
-        ]
-        return [(g, g) for g in set(genres)]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(genres__contains=[self.value()])
-
 class KeywordsListFilter(admin.SimpleListFilter):
     title = "keywords"
     parameter_name = "keywords"
@@ -237,7 +219,6 @@ class ResourceAdmin(NestedModelAdmin):
                 ('date', 'date_end', 'date_current'),
                 'categories',
                 'forms',
-                'genres',
                 'keywords',
                 'links',
             )
@@ -247,11 +228,11 @@ class ResourceAdmin(NestedModelAdmin):
             'fields': ('description', 'notes'),
         }),
     )
-    list_filter = ['locale', 'language', CategoriesListFilter, FormsListFilter, GenresListFilter, KeywordsListFilter]
+    list_filter = ['locale', 'language', CategoriesListFilter, FormsListFilter, KeywordsListFilter]
     list_display = ('name', 'alternative_names', 'date')
     list_display_links = ('name', 'alternative_names', 'date')
     ordering = ['locale', 'name']
-    search_fields = ['name', 'alternative_names']
+    search_fields = ['name', 'alternative_names', 'description', 'notes']
     formfield_overrides = {
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
@@ -288,10 +269,6 @@ class ResourceAdmin(NestedModelAdmin):
                 },
                 choices=ClsTypes.choices,
             )
-        elif db_field.name == 'genres':
-            kwargs['widget'] = Select2TagArrayWidget(attrs={
-                'data-placeholder': 'Click to add one or more genres',
-            })
         elif db_field.name == 'keywords':
             kwargs['widget'] = Select2TagArrayWidget(attrs={
                 'data-placeholder': 'Click to add one or more keywords',

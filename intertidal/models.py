@@ -35,7 +35,6 @@ class Person(models.Model):
     citation_key = models.CharField(db_index=True, blank=True)
     alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
-    emails = ArrayField(models.CharField(), default=list, blank=True)
     bio = models.TextField(blank=True)
 
     # relationships
@@ -62,7 +61,6 @@ class Organization(models.Model):
     alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True)
     address = models.CharField(blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
-    emails = ArrayField(models.CharField(), default=list, blank=True)
 
     # relationships
     # one-to-many responsibility_statements via OrganizationResponsibilityStatement Model
@@ -174,7 +172,6 @@ class Resource(models.Model):
         models.CharField(choices=ClsTypes.choices), default=list, blank=True, verbose_name='Physical/Digital Forms',
         help_text=mark_safe('See the list of <u><a href="https://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types" target="_blank">Citation Style Language Types</a></u> for descriptions of each form')
     )
-    genres = ArrayField(models.CharField(), default=list, blank=True)
     keywords = ArrayField(models.CharField(), default=list, blank=True)
     date = PartialDateField(null=True, blank=True, db_index=True)
     date_end = PartialDateField(null=True, blank=True)
@@ -214,6 +211,14 @@ class Resource(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_alternative_names_short()})" if self.get_alternative_names_short() else self.name
+
+    def save(self, *args, **kwargs):
+        # change keywords to lowercase
+        if self.keywords and len(self.keywords) > 0:
+            self.keywords = [k.lower() for k in self.keywords]
+
+        # save
+        super().save(*args, **kwargs)
 
 class Edition(models.Model):
     # fields
