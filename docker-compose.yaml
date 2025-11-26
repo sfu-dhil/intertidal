@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: intertidal
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-U", "intertidal", "-d", "intertidal"]
+      test: pg_isready -U intertidal -d intertidal && psql -U intertidal -d intertidal -c 'SELECT 1;' || exit 1
       interval: 2s
       retries: 120
 
@@ -27,6 +27,10 @@ services:
       # - .data/static:/static:ro # do not mount in development mode
     ports:
       - "8080:80"
+    healthcheck:
+      test: service nginx status || exit 1
+      interval: 2s
+      retries: 120
     depends_on:
       app:
         condition: service_healthy
@@ -61,7 +65,7 @@ services:
       MEDIA_FOLDER_GID: 101
       GUNICORN_RELOAD: True
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost/health_check/ || exit 1"]
+      test: curl --fail http://localhost/health_check/ || exit 1
       interval: 2s
       retries: 120
     depends_on:

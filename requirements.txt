@@ -1,24 +1,25 @@
 # Django
-Django==5.1.14
-django-admin-interface==0.30.0
+Django==5.2.3
+django-admin-interface==0.30.1
 django-tinymce==4.1.0
 django-advance-thumbnail==1.0.2
-django-health-check==3.18.3
+django-health-check==3.19.2
 django-cleanup==9.0.0
 django-partial-date==1.3.2
-django-nested-admin==4.1.0
+django-nested-admin==4.1.1
 django-select2==8.4.1
 django-async-upload-kg==4.0.5
+django-cache-cleaner==0.2.0
 
 # Environment variables
 django-environ==0.12.0
-python-dotenv==1.0.1
+python-dotenv==1.1.0
 
 # prod server
 gunicorn==23.0.0
 
 # image manipulation
-Pillow==11.1.0
+Pillow==11.2.1
 
 # Dataabse (psycopg[binary] cannot be locked to specific version number)
 psycopg[binary]

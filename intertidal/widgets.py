@@ -50,7 +50,7 @@ class Select2TagArrayWidget(Select2AdminMixin, Select2TagWidget):
         return super().build_attrs(default_attrs, extra_attrs=extra_attrs)
 
     def optgroups(self, name, value, attrs=None):
-        values = value[0].split(',') if value[0] else []
+        values = value[0].split(',') if len(value) > 0 and value[0] else []
         selected = set(values)
         subgroup = [self.create_option(name, v, v, selected, i) for i, v in enumerate(values)]
         return [(None, subgroup, 0)]
@@ -67,7 +67,7 @@ class Select2TagWithCommaArrayWidget(Select2AdminMixin, Select2TagWidget):
 
     def optgroups(self, name, value, attrs=None):
         values = []
-        if value[0]:
+        if len(value) > 0 and value[0]:
             values = list(csv.reader(value[0].splitlines(), delimiter=','))[0]
         selected = set(values)
         subgroup = [self.create_option(name, v, v, selected, i) for i, v in enumerate(values)]
@@ -85,5 +85,5 @@ class Select2ChoiceArrayWidget(Select2AdminMixin, Select2MultipleWidget):
         return super().build_attrs(default_attrs, extra_attrs=extra_attrs)
 
     def optgroups(self, name, value, attrs=None):
-        values = value[0].split(',') if value[0] else []
+        values = value[0].split(',') if len(value) > 0 and value[0] else []
         return super().optgroups(name, values, attrs=attrs)

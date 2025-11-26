@@ -97,7 +97,13 @@ CACHES = {
         'LOCATION': '/django_cache',
     }
 }
-CACHE_SECONDS = 1 if DEBUG else (60 * 15) # 1 second if debugging else 15 minutes
+ONE_MINUTE = 60
+ONE_HOUR = ONE_MINUTE * 60
+ONE_DAY = ONE_HOUR * 24
+ONE_WEEK = ONE_DAY * 7
+ONE_MONTH = ONE_DAY * 30
+ONE_YEAR = ONE_DAY * 365
+CACHE_SECONDS = 1 if DEBUG else env('CACHE_SECONDS', default=(ONE_MINUTE*15)) # 1 second if debugging else default 15 minutes
 
 WSGI_APPLICATION = 'intertidal_app.wsgi.application'
 
