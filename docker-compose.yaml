@@ -37,7 +37,7 @@ services:
 
   app:
     container_name: intertidal_app
-    # image: dhil/intertidal
+    # image: ghcr.io/sfu-dhil/intertidal
     build:
       context: .
       target: intertidal

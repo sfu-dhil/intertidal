@@ -1,7 +1,7 @@
+![Docker Image Latest Badge](https://ghcr-badge.egpl.dev/sfu-dhil/intertidal/latest_tag?trim=major&label=latest)
+![Docker Image Size badge](https://ghcr-badge.egpl.dev/sfu-dhil/intertidal/size)
+
 # Intertidal
-
-
-
 
 ## Requirements
 
