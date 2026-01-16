@@ -1,13 +1,14 @@
 services:
   db:
     container_name: intertidal_db
-    image: postgres:17.4
+    image: postgis/postgis:18-3.6
+    # postgis only supports the linux/amd64 platform
+    platform: linux/amd64
     ports:
       - "15432:5432"
     volumes:
-      - .data/postgres:/var/lib/postgresql/data/pgdata
+      - .data/postgres:/var/lib/postgresql
     environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_DB: intertidal
       POSTGRES_USER: intertidal
       POSTGRES_PASSWORD: password
@@ -18,7 +19,7 @@ services:
 
   nginx:
     container_name: intertidal_nginx
-    image: nginx:1.25
+    image: nginx:1.29-alpine
     volumes:
       # config
       - ./docker/nginx.conf:/etc/nginx/nginx.conf
@@ -35,6 +36,21 @@ services:
       app:
         condition: service_healthy
 
+  vite:
+    container_name: intertidal_vite
+    build:
+      context: .
+      target: intertidal-vite
+    command: yarn dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # code for development
+      - ./intertidal_vite:/app
+
+      # use the container's node_modules folders (don't override with local dev)
+      - /app/node_modules
+
   app:
     container_name: intertidal_app
     # image: ghcr.io/sfu-dhil/intertidal
@@ -49,9 +65,13 @@ services:
 
       # files uploads
       - .data/media:/media
+      # large static-assets
+      - .data/static-assets:/static-assets
 
       # # persist static outside of container so it can be shared with nginx
       # - .data/static:/app/static # do not mount in development mode
+      # use the container's node_modules folders (don't override with local dev)
+      - /app/node_modules
     environment:
       DEBUG: True
       DB_HOST: db

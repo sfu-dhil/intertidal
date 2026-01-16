@@ -55,6 +55,8 @@ example:
 ### Viewing logs (each container)
 
     docker logs -f intertidal_app
+    docker logs -f intertidal_vite
+    docker logs -f intertidal_nginx
     docker logs -f intertidal_db
     docker logs -f intertidal_mail
 
@@ -90,6 +92,22 @@ Create new migrations
 
 ## Updating Application Dependencies
 
+### Yarn (javascript)
+
+    # add new package
+    docker exec -it intertidal_vite yarn add [package]
+
+    # update a package
+    docker exec -it intertidal_vite yarn upgrade [package]
+
+    # update all packages
+    docker exec -it intertidal_vite yarn upgrade
+
+After you update a dependency make sure to rebuild the images
+
+    docker compose down
+    docker compose up -d --build
+
 ### Pip (python)
 
 Manage python dependencies in `requirements.txt`
@@ -121,22 +139,33 @@ Then backup the postgres data folder
 
     cp -R .data/postgres .data/postgres-backup
 
-Finally run a handy docker image [pgautoupgrade](https://github.com/pgautoupgrade/docker-pgautoupgrade) for upgrading postgres (match postgres version and make sure to use bookworm to match default postgres linux)
+Setup the new version dir
 
-    docker run --rm -it \
-        -v ${PWD}/.data/postgres:/var/lib/postgresql/data/pgdata \
-        -e POSTGRES_USER=<POSTGRES_USER> \
-        -e POSTGRES_PASSWORD=<POSTGRES_PASSWORD> \
-        -e PGDATA=/var/lib/postgresql/data/pgdata \
-        -e PGAUTO_ONESHOT=yes \
-        pgautoupgrade/pgautoupgrade:{VERSION-HERE}-bookworm
+    sudo mkdir -p .data/postgres/<NEW POSTGRES VERSION>/docker
+    sudo chown 999:999 -R .data/postgres/<NEW POSTGRES VERSION>
+    # example:
+    sudo mkdir -p .data/postgres/18/docker
+    sudo chown 999:999 -R .data/postgres/18
+
+
+Using `https://github.com/tianon/docker-postgres-upgrade` to upgrade the postgres version
+
+    docker run --rm \
+        --volume .data/postgres:/var/lib/postgresql \
+        --env PGDATAOLD=/var/lib/postgresql/<OLD POSTGRES VERSION>/docker \
+        --env PGDATANEW=/var/lib/postgresql/<NEW POSTGRES VERSION>/docker \
+        --env POSTGRES_USER=intertidal \
+        --env POSTGRES_PASSWORD=password \
+        tianon/postgres-upgrade:<OLD POSTGRES VERSION>-to-<NEW POSTGRES VERSION> \
+        --link
 
 example:
 
-    docker run --rm -it \
-        -v ${PWD}/.data/postgres:/var/lib/postgresql/data/pgdata \
-        -e POSTGRES_USER=intertidal \
-        -e POSTGRES_PASSWORD=password \
-        -e PGDATA=/var/lib/postgresql/data/pgdata \
-        -e PGAUTO_ONESHOT=yes \
-        pgautoupgrade/pgautoupgrade:17-bookworm
+    docker run --rm \
+        --volume .data/postgres:/var/lib/postgresql \
+        --env PGDATAOLD=/var/lib/postgresql/17/docker \
+        --env PGDATANEW=/var/lib/postgresql/18/docker \
+        --env POSTGRES_USER=intertidal \
+        --env POSTGRES_PASSWORD=password \
+        tianon/postgres-upgrade:17-to-18 \
+        --link

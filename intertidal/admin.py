@@ -2,7 +2,8 @@ from django.contrib import admin
 from partial_date import PartialDateField
 from django.db.models import TextField
 from django.contrib.postgres.fields import ArrayField
-from nested_admin.nested import NestedModelAdmin, NestedTabularInline, NestedGenericTabularInline
+from django.urls import reverse
+from nested_admin.nested import NestedModelAdmin, NestedStackedInline, NestedTabularInline, NestedGenericTabularInline
 from datetime import datetime
 from django.utils.safestring import mark_safe
 from tinymce.widgets import TinyMCE
@@ -23,7 +24,6 @@ class PersonResponsibilityStatementInline(NestedGenericTabularInline):
     model = PersonResponsibilityStatement
     ordering = ['id']
     extra = 0
-    classes = ['collapse']
     readonly_fields = ['note']
     formfield_overrides = {
         ArrayField: {
@@ -45,7 +45,6 @@ class OrganizationResponsibilityStatementInline(NestedGenericTabularInline):
     model = OrganizationResponsibilityStatement
     ordering = ['id']
     extra = 0
-    classes = ['collapse']
     readonly_fields = ['note']
     formfield_overrides = {
         ArrayField: {
@@ -66,7 +65,6 @@ class EditionInlineAdmin(NestedTabularInline):
     ordering = ['id']
     model = Edition
     extra = 0
-    classes = ['collapse']
     formfield_overrides = {
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
@@ -86,7 +84,6 @@ class OccurrenceInlineAdmin(NestedTabularInline):
     ordering = ['id']
     model = Occurrence
     extra = 0
-    classes = ['collapse']
     formfield_overrides = {
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
@@ -99,18 +96,50 @@ class OccurrenceInlineAdmin(NestedTabularInline):
     ]
 
 class ResourceImageInlineAdmin(NestedTabularInline):
-    fields = ['image']
+    fields = ['_thumbnail_image_tag', 'name', 'image']
+    readonly_fields = ['_thumbnail_image_tag']
     ordering = ['id']
     model = ResourceImage
     extra = 0
-    classes = ['collapse']
 
-class ResourceAudioInlineAdmin(NestedTabularInline):
-    fields = ['audio']
+    def _thumbnail_image_tag(self, obj):
+        return mark_safe(f'<img src="{obj.thumbnail.url}" style="max-width: 100%; max-height: 100px" />') if obj.thumbnail else ''
+    _thumbnail_image_tag.short_description = 'Image Preview'
+
+class ResourceAudioInlineAdmin(NestedStackedInline):
+    fields = [('_audio_tag', 'name', 'audio'), 'transcript']
+    readonly_fields = ['_audio_tag']
     ordering = ['id']
     model = ResourceAudio
     extra = 0
-    classes = ['collapse']
+
+    def _audio_tag(self, obj):
+        return mark_safe(f'<audio src="{obj.audio.url}" controls />') if obj.audio else ''
+    _audio_tag.short_description = 'Audio Preview'
+
+    formfield_overrides = {
+        TextField: {'widget': TinyMCE},
+    }
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'transcript':
+            people = Person.objects.order_by('fullname').all()
+            people_link_list = [{'title': person.fullname, 'value': f'javascript:showPersonModal({person.pk})'} for person in people]
+            mce_attrs={
+                'height': '800px',
+                'link_list': people_link_list,
+            }
+            object_id = request.resolver_match.kwargs.get('object_id')
+            if object_id:
+                resource_images = ResourceImage.objects.filter(resource_id=object_id).all()
+                resource_image_links = []
+                for resource_image in resource_images:
+                    resource_image_links.append({'title': resource_image.name, 'value': resource_image.image.url})
+                    resource_image_links.append({'title': f'{resource_image.name} Thumbnail', 'value': resource_image.thumbnail.url})
+                mce_attrs['image_list'] = resource_image_links
+            kwargs['widget'] = TinyMCE(mce_attrs=mce_attrs)
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
@@ -237,9 +266,7 @@ class ResourceAdmin(NestedModelAdmin):
         PartialDateField: {
             'widget': PartialDateWidget(years=PARTIAL_DATE_WIDGET_YEARS),
         },
-        TextField: {
-            'widget': TinyMCE
-        }
+        TextField: {'widget': TinyMCE},
     }
     inlines = [
         PersonResponsibilityStatementInline,
@@ -249,6 +276,13 @@ class ResourceAdmin(NestedModelAdmin):
         ResourceImageInlineAdmin,
         ResourceAudioInlineAdmin,
     ]
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        # expand description if data present
+        if obj is not None and (obj.description or obj.notes):
+            fieldsets[1][1]['classes'] = []
+        return fieldsets
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name == 'categories':

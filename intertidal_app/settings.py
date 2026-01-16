@@ -14,6 +14,7 @@ from pathlib import Path
 from environ import FileAwareEnv
 from dotenv import load_dotenv, find_dotenv
 from django.templatetags.static import static
+from django.utils.csp import CSP
 import warnings
 
 env = FileAwareEnv()
@@ -29,6 +30,11 @@ MEDIA_ROOT = '/media'
 STATIC_ROOT = BASE_DIR / 'static/'
 
 STATICFILES_DIRS = [
+    ('bootstrap', BASE_DIR / "node_modules/bootstrap"),
+    ('bootstrap-icons', BASE_DIR / "node_modules/bootstrap-icons"),
+    ('@fortawesome', BASE_DIR / "node_modules/@fortawesome"),
+    '/static-assets',
+    '/static-vite',
 ]
 
 # Quick-start development settings - unsuitable for production
@@ -57,10 +63,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'django.contrib.gis',
+    'django.contrib.postgres',
     'health_check',
     'django_select2',
     'django_cleanup.apps.CleanupConfig',
-    'admin_async_upload',
+    'django_vite',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csp.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'intertidal_app.urls'
@@ -190,17 +200,33 @@ LOGIN_URL = 'admin:login'
 LOGIN_REDIRECT_URL = 'admin:index'
 LOGOUT_REDIRECT_URL = 'admin:login'
 
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "static_url_prefix": "dist",
+    }
+}
+
 # admin interface
 warnings.filterwarnings("ignore", module="admin_interface.templatetags.admin_interface_tags")
 
 # tinymce settings
 TINYMCE_DEFAULT_CONFIG = {
     'height': '200px',
+    'width': '100%',
     'branding': False,
     'menubar': False,
-    'plugins': 'autolink, code, link, anchor, lists, table, quickbars, wordcount, pagebreak, nonbreaking',
-    'toolbar': 'undo redo | numlist bullist | fontsize | alignleft aligncenter alignright | link anchor | hr | removeformat',
+    'plugins': ['autolink', 'code', 'link', 'image', 'anchor', 'lists', 'table', 'quickbars', 'wordcount', 'pagebreak', 'nonbreaking'],
+    'toolbar': 'undo redo | numlist bullist | fontsize | alignleft aligncenter alignright | link image anchor | hr | removeformat',
     'quickbars_insert_toolbar': False,
     'quickbars_selection_toolbar': 'bold italic underline strikethrough | fontsize | forecolor | blockquote',
-    'contextmenu': 'undo redo | inserttable | cell row column deletetable',
+    'contextmenu': 'undo redo | link image | inserttable | cell row column deletetable',
+    'image_caption': True,
+    'relative_urls': False,
+    'allow_script_urls': True,
+}
+
+# Content Security Policy
+SECURE_CSP = {
+    # "default-src": [CSP.SELF],
 }

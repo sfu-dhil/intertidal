@@ -8,9 +8,7 @@ from django.conf.global_settings import LANGUAGES
 from intertidal.marc_relators import MarcRelator
 from intertidal.cls_types import ClsTypes
 from django.utils.safestring import mark_safe
-from admin_async_upload.models import AsyncFileField
 from django_advance_thumbnail import AdvanceThumbnailField
-from django.core.exceptions import ValidationError
 
 class SimpleArrayFieldSelect2Fix(SimpleArrayField):
     def prepare_value(self, value):
@@ -106,6 +104,9 @@ class PersonResponsibilityStatement(models.Model):
             models.Index(fields=['content_type', 'object_id']),
         ]
 
+    def __str__(self):
+        return f'{self.person if self.person else 'N/A'} ({', '.join([MarcRelator(marc_relator).label for marc_relator in self.marc_relators])})'
+
 class OrganizationResponsibilityStatement(models.Model):
     content_type = models.ForeignKey(
         ContentType,
@@ -136,6 +137,9 @@ class OrganizationResponsibilityStatement(models.Model):
             models.Index(fields=['content_type', 'object_id']),
         ]
 
+    def __str__(self):
+        return f'{self.organization if self.organization else 'N/A'} ({', '.join([MarcRelator(marc_relator).label for marc_relator in self.marc_relators])})'
+
 class Resource(models.Model):
     class LocaleTypes(models.TextChoices):
         VANCOUVER = "VANCOUVER", "Vancouver"
@@ -149,6 +153,8 @@ class Resource(models.Model):
         NEWS_DOCUMENTARY = "NEWS_DOCUMENTARY", "News/Documentary"
         ACADEMIC_RESEARCH = "ACADEMIC_RESEARCH", "Academic Research"
         SOCIAL_MEDIA = "SOCIAL_MEDIA", "Social Media"
+        ROUNDTABLE_INTERVIEW = "ROUNDTABLE_INTERVIEW", "Roundtable/Interview"
+        FIELD_RECORDING = "FIELD_RECORDING", "Field Recording"
 
     # fields
     locale = models.CharField(
@@ -294,12 +300,14 @@ class Occurrence(models.Model):
         return f"{self.location} ({self.date_str()})" if self.date_str() else self.location
 
 class ResourceAudio(models.Model):
-    audio = AsyncFileField(
+    name = models.CharField(verbose_name='File Name', blank=True)
+    audio = models.FileField(
         upload_to='audio/',
         null=True,
         blank=True,
         help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), WAV (.wav), or Ogg (.ogg) are recommended.'),
     )
+    transcript = models.TextField(blank=True, verbose_name='Transcript')
 
     # write tracking fields
     created = models.DateTimeField(auto_now_add=True)
@@ -312,7 +320,11 @@ class ResourceAudio(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return self.name
+
 class ResourceImage(models.Model):
+    name = models.CharField(verbose_name='File Name', blank=True)
     image = models.ImageField(
         upload_to='images/',
         width_field='image_width',
@@ -327,7 +339,6 @@ class ResourceImage(models.Model):
         null=True,
         blank=True,
     )
-
     thumbnail = AdvanceThumbnailField(
         source_field='image',
         upload_to='thumbnails/',
@@ -346,3 +357,6 @@ class ResourceImage(models.Model):
         related_name='images',
         on_delete=models.CASCADE,
     )
+
+    def __str__(self):
+        return self.name

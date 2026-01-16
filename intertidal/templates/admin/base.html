@@ -4,4 +4,12 @@
 {% block extrahead %}
     {{ block.super }}
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <style>
+        /* HACK TO FIX inline headings spacing (missing .fieldset-heading class for some reason) */
+        .collapse summary h2 {
+            display: inline;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    </style>
 {% endblock %}
