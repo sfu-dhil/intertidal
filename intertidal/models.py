@@ -226,6 +226,36 @@ class Resource(models.Model):
         # save
         super().save(*args, **kwargs)
 
+    def get_locale_choice(self):
+        return self.LocaleTypes(self.locale) if self.locale else None
+
+    def get_category_choices(self):
+        return [self.CategoryTypes(category) for category in self.categories]
+
+    def get_form_choices(self):
+        return [ClsTypes(form) for form in self.forms]
+
+    def get_contributors(self):
+        results = []
+
+        for person_responsibility_statement in self.person_responsibility_statements.all():
+            results.append({
+                'statement_type': 'person',
+                'id': person_responsibility_statement.person.id,
+                'label': person_responsibility_statement.person.fullname,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in person_responsibility_statement.marc_relators],
+            })
+
+        for organization_responsibility_statement in self.organization_responsibility_statements.all():
+            results.append({
+                'statement_type': 'organization',
+                'id': organization_responsibility_statement.organization.id,
+                'label': organization_responsibility_statement.organization.name,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in organization_responsibility_statement.marc_relators],
+            })
+
+        return sorted(results, key=lambda item: item['label'])
+
 class Edition(models.Model):
     # fields
     name = models.CharField(verbose_name='Name/Title', blank=True)
@@ -254,6 +284,27 @@ class Edition(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.date})" if self.date else self.name
+
+    def get_contributors(self):
+        results = []
+
+        for person_responsibility_statement in self.person_responsibility_statements.all():
+            results.append({
+                'statement_type': 'person',
+                'id': person_responsibility_statement.person.id,
+                'label': person_responsibility_statement.person.fullname,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in person_responsibility_statement.marc_relators],
+            })
+
+        for organization_responsibility_statement in self.organization_responsibility_statements.all():
+            results.append({
+                'statement_type': 'organization',
+                'id': organization_responsibility_statement.organization.id,
+                'label': organization_responsibility_statement.organization.name,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in organization_responsibility_statement.marc_relators],
+            })
+
+        return sorted(results, key=lambda item: item['label'])
 
 class Occurrence(models.Model):
     # fields
@@ -298,6 +349,27 @@ class Occurrence(models.Model):
 
     def __str__(self):
         return f"{self.location} ({self.date_str()})" if self.date_str() else self.location
+
+    def get_contributors(self):
+        results = []
+
+        for person_responsibility_statement in self.person_responsibility_statements.all():
+            results.append({
+                'statement_type': 'person',
+                'id': person_responsibility_statement.person.id,
+                'label': person_responsibility_statement.person.fullname,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in person_responsibility_statement.marc_relators],
+            })
+
+        for organization_responsibility_statement in self.organization_responsibility_statements.all():
+            results.append({
+                'statement_type': 'organization',
+                'id': organization_responsibility_statement.organization.id,
+                'label': organization_responsibility_statement.organization.name,
+                'marc_relator_choices': [MarcRelator(marc_relator) for marc_relator in organization_responsibility_statement.marc_relators],
+            })
+
+        return sorted(results, key=lambda item: item['label'])
 
 class ResourceAudio(models.Model):
     name = models.CharField(verbose_name='File Name', blank=True)

@@ -96,6 +96,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'intertidal.context_processors.get_git_info',
             ],
         },
     },
@@ -194,6 +195,12 @@ SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 256 * 1024 * 1024 # 256MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 256 * 1024 * 1024 # 256MB
+
+GIT_REPO = "https://github.com/sfu-dhil/intertidal"
+GIT_COMMIT = env('GIT_COMMIT', default='')
+GIT_COMMIT_SHORT = env('GIT_COMMIT_SHORT', default='')
+GIT_BRANCH = env('GIT_BRANCH', default='')
+GIT_TAG = env('GIT_TAG', default='')
 
 # login/logout settings
 LOGIN_URL = 'admin:login'

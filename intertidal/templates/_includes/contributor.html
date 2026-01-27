@@ -1,0 +1,10 @@
+<div>
+    {% if contributor.statement_type == 'person' %}
+        <a href="javascript:showPersonModal({{ contributor.id }})" class="fw-bold">{{ contributor.label }}</a>
+    {% elif contributor.statement_type == 'organization' %}
+        <a href="javascript:showOrganizationModal({{ contributor.id }})" class="fw-bold">{{ contributor.label }}</a>
+    {% endif %}
+    {% for marc_relator_choice in contributor.marc_relator_choices %}
+        <span class="badge text-bg-primary">{{ marc_relator_choice.label }}</span>
+    {% endfor %}
+</div>

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
+{% block javascript %}
+{% endblock %}
+
 {% block content %}
-    Under construction <br />
-    <a href="{% url 'admin:login' %}">CLick here for the admin panel</a>
+    <div class="container">
+        Under construction <br />
+        <a href="{% url 'admin:login' %}">Click here for the admin panel</a>
+    </div>
 {% endblock %}

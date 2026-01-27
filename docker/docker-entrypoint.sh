@@ -20,8 +20,8 @@ MEDIA_FOLDER_UID=${MEDIA_FOLDER_UID-101}
 MEDIA_FOLDER_GID=${MEDIA_FOLDER_GID-101}
 mkdir -p /media/audio /media/images /media/thumbnails
 chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /media /media/audio /media/images /media/thumbnails
-mkdir -p /static-assets/videos
-chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /static-assets/videos
+mkdir -p /static-assets/audio /static-assets/images /static-assets/videos
+chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /static-assets /static-assets/audio /static-assets/images /static-assets/videos
 mkdir -p /static-vite/dist/assets
 chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /static-vite/dist /static-vite/dist/assets
 

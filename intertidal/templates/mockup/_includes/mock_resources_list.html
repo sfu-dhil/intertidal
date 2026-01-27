@@ -1,0 +1,64 @@
+{% load i18n %}
+
+{% for resource in resources %}
+    {% with image=resource.images.all|first category_choices=resource.get_category_choices locale=resource.get_locale_choice forms=resource.get_form_choices responsibility_statements=resource.get_contributors %}
+        <div class="card mb-3">
+            {% if image %}
+                <img src="{{ image.thumbnail.url }}" class="card-img-top object-fit-cover" style="max-height: 20em;" alt="{{ image.name }}">
+            {% endif %}
+            <div class="card-header d-flex w-100 justify-content-between">
+                {{ resource.name }}
+                {% if resource.date %}
+                    <span class="badge text-bg-secondary rounded-pill">
+                        {{ resource.date }}
+                        {% if resource.date_current %}
+                            to now
+                        {% elif resource.date_end %}
+                            to {{ resource.date_end }}
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {% if locale %}
+                        <span class="badge text-bg-primary" title="Locale: {{ locale.label|escape }}" data-locale="{{ locale.value|escape }}">{{ locale.label }}</span>
+                    {% endif %}
+                    {% if resource.language %}
+                        <span class="badge text-bg-primary" title="Language: {{ resource.language|language_name|escape }}" data-language="{{ resource.language|escape }}">{{ resource.language|language_name }}</span>
+                    {% endif %}
+                    {% if category_choices|length > 0 %}
+                        {% for category in category_choices %}
+                            <span class="badge text-bg-primary" title="Category: {{ category.label|escape }}" data-category="{{ category.value|escape }}">{{ category.label }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    {% if forms|length > 0 %}
+                        {% for form in forms %}
+                            <span class="badge text-bg-primary" title="Physical/Digital Forms: {{ form.label|escape }}" data-form="{{ form.value|escape }}">{{ form.label }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% if resource.keywords|length > 0 %}
+                    <div class="mb-3">
+                        {% for keyword in resource.keywords %}
+                            <span class="badge text-bg-success" title="Keyword: {{ keyword|escape }}" data-keyword="{{ keyword|escape }}">{{ keyword }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if responsibility_statements|length > 0 %}
+                    <div class="">
+                        {% for responsibility_statement in responsibility_statements %}
+                            {% partialdef role_labels %}{% for marc_relator_choice in responsibility_statement.marc_relator_choices %}{% if not forloop.first %}, {% endif %}{{ marc_relator_choice.label }}{% endfor %}{% endpartialdef %}
+                            {% if responsibility_statement.statement_type == 'person' %}
+                                <span class="badge text-bg-primary" title="Person: ({% partial role_labels %})" data-person="{{ responsibility_statement.id|escape }}">{{ responsibility_statement.label }} ({% partial role_labels %})</span>
+                            {% else %}
+                                <span class="badge text-bg-primary" title="Organization: {{ responsibility_statement.label|escape }} ({% partial role_labels %})" data-organization="{{ responsibility_statement.id|escape }}">{{ responsibility_statement.label }} ({% partial role_labels %})</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <a href="{% url 'resource-details' pk=resource.pk %}" class="stretched-link"></a>
+        </div>
+    {% endwith %}
+{% endfor %}

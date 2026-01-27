@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load django_vite %}
+
+{% block javascript %}
+    {% vite_asset 'shikwasa_player_app.js' crossorigin="" %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ object.name }}</h1>
+        {% for alternative_name in object.alternative_names %}
+            <div class="h6">{{ alternative_name }}</div>
+        {% endfor %}
+        <hr />
+
+        <div class="card mb-5">
+            <div class="card-header">Resource Details</div>
+            <ul class="list-group list-group-flush">
+                {% if object.locale %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Locale</div>
+                        <span class="badge text-bg-primary">{{ object.get_locale_choice.label }}</span>
+                    </li>
+                {% endif %}
+                {% if object.language %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Language</div>
+                        <span class="badge text-bg-primary">{{ resource.language|language_name }}</span>
+                    </li>
+                {% endif %}
+                {% if object.date %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Date</div>
+                        {{ object.date }}
+                        {% if object.date_current %}
+                            to now
+                        {% elif object.date_end %}
+                            to {{ object.date_end }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {% if object.get_category_choices|length > 0 %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Categories</div>
+                        {% for category_choice in object.get_category_choices %}
+                            <span class="badge text-bg-primary">{{ category_choice.label }}</span>
+                        {% endfor %}
+                    </li>
+                {% endif %}
+                {% if object.get_form_choices|length > 0 %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Physical/Digital Forms</div>
+                        {% for form_choice in object.get_form_choices %}
+                            <span class="badge text-bg-primary">{{ form_choice.label }}</span>
+                        {% endfor %}
+                    </li>
+                {% endif %}
+                {% if object.keywords|length > 0 %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Keywords</div>
+                        {% for keyword in object.keywords %}
+                            <span class="badge text-bg-primary">{{ keyword }}</span>
+                        {% endfor %}
+                    </li>
+                {% endif %}
+                {% if object.description %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Description</div>
+                        {{ object.description|safe }}
+                    </li>
+                {% endif %}
+                {% if object.links|length > 0 %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Links</div>
+                        {% for link in object.links %}
+                            <a target="_blank" href="{{ link }}">{{ link }}</a><br />
+                        {% endfor %}
+                    </li>
+                {% endif %}
+                {% if object.get_contributors|length > 0 %}
+                    <li class="list-group-item list-group-item-action">
+                        <div class="fw-bold">Contributors</div>
+                        {% for contributor in object.get_contributors %}
+                            {% include "_includes/contributor.html" with contributor=contributor %}
+                        {% endfor %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        {% if object.images.all|length > 0 %}
+            <h2 class="h3">Images</h2>
+            <div class="row row-cols-1 row-cols-md-6 g-4 mb-5">
+                {% for image in object.images.all %}
+                    <div class="col">
+                        <figure class="figure">
+                            <img src="{{ image.thumbnail.url }}" class="figure-img img-fluid rounded" alt="{{ image.name|escape }}">
+                            <figcaption class="figure-caption text-center">{{ image.name}} </figcaption>
+                        </figure>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if object.audios.all|length > 0 %}
+            <h2 class="h3">Audio Recordings</h2>
+            {% for audio in object.audios.all %}
+                <div class="card mb-5">
+                    <div class="card-header">
+                        {{ audio.name }}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item list-group-item-action">
+                            <div class="shikwasa-player-app" data-src="{{ audio.audio.url }}" data-title="{{ audio.name }}"></div>
+                        </li>
+                        {% if audio.transcript %}
+                            <li class="list-group-item list-group-item-action">
+                                <div class="fw-bold">Transcripts</div>
+                                <div class="resource_transcripts">
+                                    {{ audio.transcript|safe }}
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if object.editions.all|length > 0 %}
+        <h2 class="h3">Editions</h2>
+            {% for edition in object.editions.all %}
+                <div class="card mb-5">
+                    <div class="card-header d-flex justify-content-between align-items-start">
+                        {{ edition.name }}
+                        {% if edition.date %}
+                            <span class="badge text-bg-primary rounded-pill">{{ edition.date }}</span>
+                        {% endif %}
+                    </div>
+                    {% if edition.get_contributors|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item-action">
+                                <div class="fw-bold">Contributors</div>
+                                {% for contributor in edition.get_contributors %}
+                                    {% include "_includes/contributor.html" with contributor=contributor %}
+                                {% endfor %}
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if object.occurrences.all|length > 0 %}
+        <h2 class="h3">Special Occurrences</h2>
+
+            {% for occurrence in object.occurrences.all %}
+                <div class="card mb-5">
+                    <div class="card-header d-flex justify-content-between align-items-start">
+                        {{ occurrence.location }}
+                        {% if occurrence.date %}
+                            <span class="badge text-bg-primary rounded-pill">
+                                {{ occurrence.date }}
+                                {% if occurrence.date_current %}
+                                    - now
+                                {% elif occurrence.date_end %}
+                                    - {{ occurrence.date_end }}
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% if occurrence.address %}
+                            <li class="list-group-item list-group-item-action">
+                                <div class="fw-bold">Address</div>
+                                {{ occurrence.address }}
+                            </li>
+                        {% endif %}
+                        {% if edition.get_contributors|length > 0 %}
+                            <li class="list-group-item list-group-item-action">
+                                <div class="fw-bold">Contributors</div>
+                                {% for contributor in edition.get_contributors %}
+                                    {% include "_includes/contributor.html" with contributor=contributor %}
+                                {% endfor %}
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block backdrop_media_app %}
+    {% static 'videos/backdrop_test_1/master.mpd' as video_src %}
+    {% with backdrop_video_src=video_src %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}

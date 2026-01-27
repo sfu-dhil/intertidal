@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_vite %}
+
+{% block javascript %}
+    {% vite_asset 'aplayer_app.js' crossorigin="" %}
+    {% vite_asset 'resources_app.js' crossorigin="" %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="display-3 fw-bolder my-5">Intertidal</h1>
+
+        <div class="row align-items-stretch gx-5 justify-content-center my-5">
+            <div class="col-md-12 col-lg-8">
+                <p class="lead fw-normal mb-4">
+                    My work comes to you from the intertidal zones of Singapore, Hong Kong, and Vancouver.
+                    From the human and nonhuman voices that exist in relation with beaches, ports, harbours, swamps, wetlands, and dykes.
+                    These are space of flux, ecological richness, nationalist and capitalist infrastructure, complex histories, and environmental devastation.
+                    Each of these sites, whether island, continent edge, or archipelago shares the common histories of imperialism, development, land reclamation, and dispossession.
+                    By reading and listening intently to these spaces, I seek to represent and reimagine these spaces in decolonial ways.
+                </p>
+            </div>
+            <div class="col-md-12 col-lg-4">
+            </div>
+            <div class="col-md-12 col-lg-8">
+            </div>
+            <div class="col-md-12 col-lg-4">
+                <div class="aplayer-app" data-audio-json="{{ audio_json|escape }}"></div>
+            </div>
+        </div>
+        <p class="lead fw-normal my-5">{% lorem 1 random %}</p>
+        <p class="lead fw-normal my-5">{% lorem 1 random %}</p>
+        {% include 'mockup/_includes/mock_map.html' %}
+    </div>
+    <div class="container-fluid">
+        <div class="container">
+            <p>
+                Resource list interaction roughly based on <a href="https://mariandoerk.de/" target="_blank">https://mariandoerk.de/</a>.
+                Appearance can be improved as well as connection links add between contributors/keyword and the resource (skipped for now. really rough mockup of it).
+            </p>
+        </div>
+        <div id="resources-app" data-resources-json="{{ resources_json|escape }}" data-people-json="{{ people_json|escape }}" data-organizations-json="{{ organizations_json|escape }}"></div>
+    </div>
+{% endblock %}
+
+{% block backdrop_media_app %}
+    {% static 'videos/backdrop_test_2/master.mpd' as video_src %}
+    {% with backdrop_video_src=video_src %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}

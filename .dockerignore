@@ -163,6 +163,7 @@ cython_debug/
 node_modules/
 /static/
 *.sql
+transforms.trf
 
 # Docker image specific
 /.github/
