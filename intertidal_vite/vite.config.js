@@ -21,10 +21,7 @@ export default defineConfig({
     outDir: resolve("./dist"),
     rollupOptions: {
       input: {
-        resources_app: resolve('./src/resources_app.js'),
-        backdrop_media_app: resolve('./src/backdrop_media_app.js'),
-        shikwasa_player_app: resolve('./src/shikwasa_player_app.js'),
-        aplayer_app: resolve('./src/aplayer_app.js'),
+        intertidal: resolve('./src/intertidal.js'),
       },
     },
   },

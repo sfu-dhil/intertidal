@@ -11,7 +11,7 @@ const {
 </script>
 
 <template>
-  <ul class="nav flex-column">
+  <ul class="nav flex-column text-end">
     <KeywordFilterListItem v-for="keyword in keywords" :keyword="keyword" />
   </ul>
 </template>

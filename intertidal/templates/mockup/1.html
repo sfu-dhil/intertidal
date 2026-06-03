@@ -2,10 +2,6 @@
 {% load static %}
 {% load django_vite %}
 
-{% block javascript %}
-    {% vite_asset 'shikwasa_player_app.js' crossorigin="" %}
-{% endblock %}
-
 {% block content %}
     <div class="container">
         <h1 class="display-4 fw-bolder my-5">Intertidal</h1>
@@ -24,17 +20,24 @@
             <div class="col-md-12 col-lg-4">
             </div>
             <div class="col-md-12 col-lg-8">
-                <div class="shikwasa-player-app" data-src="{% static 'audio/intertidal_draft_ambient_soundscape.ogg' %}" data-title="Intertidal Ambient Soundscape" data-chapters-json="{{ chapters_json|escape }}"></div>
+                <div class="shikwasa-player-app" data-src="{% static 'audio/intertidal_draft_ambient_soundscape.m4a' %}" data-title="Intertidal Ambient Soundscape"></div>
             </div>
         </div>
-
-        {% include 'mockup/_includes/mock_map.html' %}
-        {% include 'mockup/_includes/mock_resources_list.html' %}
+        {% comment %} {% include 'mockup/_includes/mock_map.html' %} {% endcomment %}
+    </div>
+    <div class="container-fluid">
+        <div class="container">
+            <p>
+                Resource list interaction roughly based on <a href="https://mariandoerk.de/" target="_blank">https://mariandoerk.de/</a>.
+                Appearance can be improved as well as connection links add between contributors/keyword and the resource (skipped for now. really rough mockup of it).
+            </p>
+        </div>
+        <div id="resources-app" data-resources-json="{{ resources_json|escape }}" data-people-json="{{ people_json|escape }}" data-organizations-json="{{ organizations_json|escape }}"></div>
     </div>
 {% endblock %}
 
 {% block backdrop_media_app %}
-    {% static 'videos/backdrop_test_1/master.mpd' as video_src %}
+    {% static 'videos/backdrop/master.mpd' as video_src %}
     {% with backdrop_video_src=video_src %}
         {{ block.super }}
     {% endwith %}

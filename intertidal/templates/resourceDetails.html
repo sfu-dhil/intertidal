@@ -3,10 +3,6 @@
 {% load i18n %}
 {% load django_vite %}
 
-{% block javascript %}
-    {% vite_asset 'shikwasa_player_app.js' crossorigin="" %}
-{% endblock %}
-
 {% block content %}
     <div class="container">
         <h1>{{ object.name }}</h1>
@@ -193,7 +189,7 @@
 {% endblock %}
 
 {% block backdrop_media_app %}
-    {% static 'videos/backdrop_test_1/master.mpd' as video_src %}
+    {% static 'videos/backdrop/master.mpd' as video_src %}
     {% with backdrop_video_src=video_src %}
         {{ block.super }}
     {% endwith %}

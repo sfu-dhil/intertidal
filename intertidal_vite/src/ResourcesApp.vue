@@ -32,17 +32,15 @@ resourceDataStore.initData(props.resources, props.people, props.organizations)
 <template>
   <div class="d-flex justify-content-center">
     <div class="sticky-top p-3 pe-5 h-100">
-      <h2 class="h4 text-center">Contributors</h2>
-      <hr />
+      <h2 class="h2 text-center">Contributors</h2>
       <ContributorFilterList />
     </div>
-    <div class="container flex-grow-1 mx-0 px-0 h-100">
+    <div class="flex-grow-1 mx-5 px-0 h-100">
       <h2 class="h4 text-center">Resources</h2>
       <ResourceList />
     </div>
     <div class="sticky-top p-3 pe-5 h-100">
-      <h2 class="h4 text-center">Keywords</h2>
-      <hr />
+      <h2 class="h2 text-center">Keywords</h2>
       <KeywordFilterList />
     </div>
   </div>

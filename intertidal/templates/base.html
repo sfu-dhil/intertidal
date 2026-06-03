@@ -12,16 +12,9 @@
         <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 
         {% vite_hmr_client %}
-        <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" />
-        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" />
-        <link rel="stylesheet" href="{% static '@fortawesome/fontawesome-free/css/fontawesome.min.css' %}" />
-        <link rel="stylesheet" href="{% static '@fortawesome/fontawesome-free/css/solid.min.css' %}" />
-        <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+        {% vite_asset 'intertidal.js' crossorigin="" %}
         {% block styles %}
         {% endblock %}
-
-        <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/base.js' %}"></script>
     </head>
     <body class="d-flex flex-column h-100">
         <main class="flex-grow-1 py-5 z-1 position-relative bg-transparent">
@@ -50,7 +43,6 @@
         {% block backdrop_media_app %}
             {% if backdrop_video_src or backdrop_image_src %}
                 <div id="backdrop-media-app" class="position-fixed top-0 bottom-0 start-0 end-0 z-0 bg-secondary-subtle" data-video-src="{{ backdrop_video_src }}" data-image-src="{{ backdrop_image_src }}"></div>
-                {% vite_asset 'backdrop_media_app.js' crossorigin="" %}
             {% else %}
                 <div class="position-absolute top-0 bottom-0 start-0 end-0 z-0 bg-secondary-subtle"></div>
             {% endif %}

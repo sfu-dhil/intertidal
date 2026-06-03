@@ -30,9 +30,6 @@ MEDIA_ROOT = '/media'
 STATIC_ROOT = BASE_DIR / 'static/'
 
 STATICFILES_DIRS = [
-    ('bootstrap', BASE_DIR / "node_modules/bootstrap"),
-    ('bootstrap-icons', BASE_DIR / "node_modules/bootstrap-icons"),
-    ('@fortawesome', BASE_DIR / "node_modules/@fortawesome"),
     '/static-assets',
     '/static-vite',
 ]

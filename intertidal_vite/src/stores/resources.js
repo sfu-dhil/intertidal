@@ -97,7 +97,7 @@ export const useResourceGraphStore = defineStore('resources-graph', {
           return 1
         }
         return a[1] - b[1]
-      }).slice(0, 10).reduce((result, a) => result.set(a[0], a[1]), new Map())
+      }).slice(0, 25).reduce((result, a) => result.set(a[0], a[1]), new Map())
     },
     rankedKeywordMap: (state) => {
       const keyword_references = new Map()
@@ -115,7 +115,7 @@ export const useResourceGraphStore = defineStore('resources-graph', {
           return 1
         }
         return a[1] - b[1]
-      }).slice(0, 10).reduce((result, a) => result.set(a[0], a[1]), new Map())
+      }).slice(0, 25).reduce((result, a) => result.set(a[0], a[1]), new Map())
     },
   },
   actions: {

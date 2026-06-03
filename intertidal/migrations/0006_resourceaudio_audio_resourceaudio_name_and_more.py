@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resourceaudio',
             name='audio',
-            field=models.FileField(blank=True, help_text='Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), WAV (.wav), or Ogg (.ogg) are recommended.', null=True, upload_to='audio/'),
+            field=models.FileField(blank=True, help_text='Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), AAC (.m4a), WAV (.wav), or Ogg (.ogg) are recommended.', null=True, upload_to='audio/'),
         ),
         migrations.AddField(
             model_name='resourceaudio',

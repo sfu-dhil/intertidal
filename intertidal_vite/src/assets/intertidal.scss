@@ -1,0 +1,32 @@
+// bootstrap
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// fontawesome
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+@import '@fortawesome/fontawesome-free/css/solid.min.css';
+
+// videojs
+@import 'video.js/dist/video-js.css';
+@import 'videojs-theme-kit/style.css';
+
+// shikwasa
+@import 'shikwasa/dist/style.css';
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.resource_transcripts p {
+    margin: 0 !important;
+}
+
+// hide cover if needed
+.shk-cover {
+    display: none;
+}
+.shk-main {
+    max-width: 100%;
+}
