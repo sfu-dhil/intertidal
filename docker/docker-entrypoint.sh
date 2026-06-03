@@ -26,6 +26,6 @@ mkdir -p /static-vite/dist/assets
 chown $MEDIA_FOLDER_UID:$MEDIA_FOLDER_GID /static-vite/dist /static-vite/dist/assets
 
 # ensure django file cache directory exists
-mkdir -p /django_cache
+mkdir -p /django-cache
 
 gunicorn --config /app/gunicorn.config.py intertidal_app.wsgi:application

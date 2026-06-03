@@ -1,5 +1,5 @@
 # Node deps
-FROM node:25.3-slim AS intertidal-vite
+FROM node:25.5 AS intertidal-vite
 WORKDIR /app
 
 RUN npm upgrade -g npm \

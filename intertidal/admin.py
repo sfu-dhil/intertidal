@@ -8,13 +8,13 @@ from datetime import datetime
 from django.utils.safestring import mark_safe
 from tinymce.widgets import TinyMCE
 
-from intertidal.models import Resource, Edition, Occurrence, \
+from .models import Resource, Edition, Occurrence, \
     PersonResponsibilityStatement, Person, \
     OrganizationResponsibilityStatement, Organization, \
     ResourceImage, ResourceAudio
-from intertidal.widgets import PartialDateWidget, Select2ChoiceArrayWidget, Select2TagArrayWidget, Select2TagWithCommaArrayWidget
-from intertidal.marc_relators import MarcRelator
-from intertidal.cls_types import ClsTypes
+from .widgets import PartialDateWidget, Select2ChoiceArrayWidget, Select2TagArrayWidget, Select2TagWithCommaArrayWidget
+from .marc_relators import MarcRelator
+from .cls_types import ClsTypes
 
 PARTIAL_DATE_WIDGET_YEARS = list(reversed(range(0, datetime.today().year+1)))
 

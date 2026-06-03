@@ -105,7 +105,7 @@ TEMPLATES = [
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/django_cache',
+        'LOCATION': '/django-cache',
     }
 }
 ONE_MINUTE = 60
@@ -224,9 +224,9 @@ TINYMCE_DEFAULT_CONFIG = {
     'branding': False,
     'menubar': False,
     'plugins': ['autolink', 'code', 'link', 'image', 'anchor', 'lists', 'table', 'quickbars', 'wordcount', 'pagebreak', 'nonbreaking'],
-    'toolbar': 'undo redo | numlist bullist | fontsize | alignleft aligncenter alignright | link image anchor | hr | removeformat',
+    'toolbar': 'undo redo | numlist bullist | styles | fontsize | alignleft aligncenter alignright | link image anchor | hr | removeformat',
     'quickbars_insert_toolbar': False,
-    'quickbars_selection_toolbar': 'bold italic underline strikethrough | fontsize | forecolor | blockquote',
+    'quickbars_selection_toolbar': 'bold italic underline strikethrough | styles | fontsize | forecolor | blockquote',
     'contextmenu': 'undo redo | link image | inserttable | cell row column deletetable',
     'image_caption': True,
     'relative_urls': False,
