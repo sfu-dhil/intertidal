@@ -1,4 +1,4 @@
-from ninja import ModelSchema, Field
+from ninja import Schema, ModelSchema, Field
 from typing import List, Optional
 
 from .models import Resource, Occurrence, Edition, \
@@ -41,24 +41,50 @@ class ResourceAudioStubSchema(ModelSchema):
             'id', 'name', 'audio',
         ]
 
+class PersonResponsibilityStatementsStubSchema(ModelSchema):
+    class Meta:
+        model = PersonResponsibilityStatement
+        fields = [
+            'person', 'marc_relators',
+        ]
+class OrganizationResponsibilityStatementsStubSchema(ModelSchema):
+    class Meta:
+        model = OrganizationResponsibilityStatement
+        fields = [
+            'organization', 'marc_relators',
+        ]
+
 class ResourceStubSchema(ModelSchema):
     person_ids: List[int] = []
     organization_ids: List[int] = []
     images: List[ResourceImageStubSchema] = []
     audios: List[ResourceAudioStubSchema] = []
+    person_responsibility_statements: List[PersonResponsibilityStatementsStubSchema]
+    organization_responsibility_statements: List[OrganizationResponsibilityStatementsStubSchema]
     date_year: Optional[int]
+    date: Optional[str]
+    date_end: Optional[str]
 
     class Meta:
         model = Resource
         fields = [
             'id', 'name',
             'locale', 'categories', 'language', 'forms', 'keywords',
+            'date_current',
             # 'date_current', 'date_end', 'alternative_names', 'description', 'links',
         ]
 
     @staticmethod
     def resolve_date_year(obj):
         return int(obj.date.date.strftime('%Y')) if obj.date else None
+
+    @staticmethod
+    def resolve_date(obj):
+        return obj.date.format('%Y', '%B %Y', '%-d %B %Y') if obj.date else None
+
+    @staticmethod
+    def resolve_date_end(obj):
+        return obj.date_end.format('%Y', '%B %Y', '%-d %B %Y') if obj.date_end else None
 
     @staticmethod
     def resolve_person_ids(obj):

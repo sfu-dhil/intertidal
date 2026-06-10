@@ -10,23 +10,25 @@ const {
 } = storeToRefs(resourceFilterStore)
 
 const props = defineProps({
-  contributor: {
+  category: {
     type: Object,
     required: true,
   },
 })
-const collaboratorCoordinateMap = defineModel('collaboratorCoordinateMap', { default: new Map() })
-
+const categoryCoordinateMap = defineModel('categoryCoordinateMap', { default: new Map() })
 
 const itemEl = useTemplateRef('itemEl')
-const { top, height, right, update: updateElementBounding } = useElementBounding(itemEl)
+const { top, height, left, update: updateElementBounding } = useElementBounding(itemEl)
 watch(top, (newValue, oldValue) => {
   if (newValue !== oldValue) { updateCoordinates() }
 })
-watch(right, (newValue, oldValue) => {
+watch(left, (newValue, oldValue) => {
   if (newValue !== oldValue) { updateCoordinates() }
 })
 watch(height, (newValue, oldValue) => {
+  if (newValue !== oldValue) { updateCoordinates() }
+})
+watch(() => props.category.active, (newValue, oldValue) => {
   if (newValue !== oldValue) { updateCoordinates() }
 })
 watch(selectedKey, (newValue, oldValue) => {
@@ -34,39 +36,39 @@ watch(selectedKey, (newValue, oldValue) => {
 })
 
 const fontSize = computed(() => {
-  return 1.0 + Math.min((props.contributor.rank-1)/8, 0.5)
+  return 1.0 + Math.min((props.category.rank-1)/8, 0.5)
 })
-const updateSelected = () => props.contributor.key.startsWith('person_') ? useResourceFilterStore().selectPerson(props.contributor.id) : useResourceFilterStore().selectOrganization(props.contributor.id)
+const updateSelected = () => useResourceFilterStore().selectCategory(props.category.id)
 
 const updateCoordinates = () => {
   if (top.value + height.value >= 0 && top.value <= window.innerHeight) {
-    collaboratorCoordinateMap.value.set(props.contributor.key, {right: right.value + 5, y: top.value + (height.value/2)})
+    categoryCoordinateMap.value.set(props.category.id, {left: left.value - 5, y: top.value + (height.value/2)})
   } else {
-    collaboratorCoordinateMap.value.delete(props.contributor.key)
+    categoryCoordinateMap.value.delete(props.category.id)
   }
 }
 onMounted(() => {
   updateCoordinates()
 })
 onUnmounted(() => {
-  collaboratorCoordinateMap.value.delete(props.contributor.key)
+  categoryCoordinateMap.value.delete(props.category.id)
 })
 </script>
 
 <template>
-  <a ref="itemEl" v-motion-slide-visible-once-left
-    class="nav-link me-auto px-0 text-truncate" role="button"
+  <a ref="itemEl" v-motion-slide-visible-once-right
+    class="nav-link ms-auto px-0 text-truncate" role="button"
     :class="{
-      'active': contributor.active,
-      'fw-bold': contributor.active,
-      'text-decoration-underline': contributor.active,
-      'text-light-emphasis': contributor.active,
-      'text-light': !contributor.active,
+      'active': category.active,
+      'fw-bold': category.active,
+      'text-decoration-underline': category.active,
+      'text-light-emphasis': category.active,
+      'text-light': !category.active,
     }"
     :style="{ 'font-size': `${fontSize}em` }"
     @click="updateSelected"
-    :title="contributor.label"
-  >{{ contributor.label }}</a>
+    :title="category.label"
+  >{{ category.label }}</a>
 </template>
 
 <style scoped>

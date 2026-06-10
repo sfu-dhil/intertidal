@@ -23,16 +23,10 @@
                 <div class="shikwasa-player-app" data-src="{% static 'audio/intertidal_draft_ambient_soundscape.m4a' %}" data-title="Intertidal Ambient Soundscape"></div>
             </div>
         </div>
-        {% comment %} {% include 'mockup/_includes/mock_map.html' %} {% endcomment %}
+        <div id="map-filter-app"></div>
     </div>
     <div class="container-fluid">
-        <div class="container">
-            <p>
-                Resource list interaction roughly based on <a href="https://mariandoerk.de/" target="_blank">https://mariandoerk.de/</a>.
-                Appearance can be improved as well as connection links add between contributors/keyword and the resource (skipped for now. really rough mockup of it).
-            </p>
-        </div>
-        <div id="resources-app" data-resources-json="{{ resources_json|escape }}" data-people-json="{{ people_json|escape }}" data-organizations-json="{{ organizations_json|escape }}"></div>
+        <div id="resources-app" data-resources-json="{{ resources_json|escape }}" data-people-json="{{ people_json|escape }}" data-organizations-json="{{ organizations_json|escape }}" data-marc-relators-json="{{ marc_relators_json|escape }}"></div>
     </div>
 {% endblock %}
 

@@ -5,10 +5,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from partial_date import PartialDateField
 from django.conf.global_settings import LANGUAGES
-from intertidal.marc_relators import MarcRelator
-from intertidal.cls_types import ClsTypes
 from django.utils.safestring import mark_safe
 from django_advance_thumbnail import AdvanceThumbnailField
+
+from .marc_relators import MarcRelator
+from .cls_types import ClsTypes
 
 class SimpleArrayFieldSelect2Fix(SimpleArrayField):
     def prepare_value(self, value):

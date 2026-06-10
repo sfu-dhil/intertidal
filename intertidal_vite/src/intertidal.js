@@ -2,9 +2,11 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { MotionPlugin } from '@vueuse/motion'
 import BackdropMediaApp from './BackdropMediaApp.vue'
 import VideoPlayer from '@videojs-player/vue'
 import ResourcesApp from './ResourcesApp.vue'
+import MapFilterApp from './MapFilterApp.vue'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -37,8 +39,17 @@ ready(() => {
       resources: mountEl.dataset.resourcesJson ? JSON.parse(mountEl.dataset.resourcesJson) : [],
       people: mountEl.dataset.peopleJson ? JSON.parse(mountEl.dataset.peopleJson) : [],
       organizations: mountEl.dataset.organizationsJson ? JSON.parse(mountEl.dataset.organizationsJson) : [],
+      marcRelators: mountEl.dataset.marcRelatorsJson ? JSON.parse(mountEl.dataset.marcRelatorsJson) : [],
     })
     app.use(pinia)
+    app.use(MotionPlugin)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('#map-filter-app').forEach((mountEl) => {
+    const app = createApp(MapFilterApp)
+    app.use(pinia)
+    app.use(MotionPlugin)
     app.mount(mountEl)
   })
 

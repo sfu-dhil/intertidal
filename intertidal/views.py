@@ -3,6 +3,8 @@ import json
 from django.views.generic import TemplateView, DetailView, ListView
 from django.templatetags.static import static
 from django.shortcuts import render
+
+from .marc_relators import MarcRelator
 from .models import Resource, Person, Organization
 from .schema import ResourceStubSchema, PersonStubSchema, OrganizationStubSchema
 
@@ -10,7 +12,7 @@ from .schema import ResourceStubSchema, PersonStubSchema, OrganizationStubSchema
 def home(request):
     return render(request, 'index.html')
 
-def mockup(request, version):
+def mockup(request):
     resources = Resource.objects.prefetch_related(
         'person_responsibility_statements', 'organization_responsibility_statements',
 
@@ -26,11 +28,12 @@ def mockup(request, version):
     people = Person.objects.order_by('fullname').all()
     organizations = Organization.objects.order_by('name').all()
 
-    return render(request, f'mockup/{version}.html', {
+    return render(request, f'mockup.html', {
         'resources': resources,
         'resources_json': json.dumps([ResourceStubSchema.from_orm(resource).dict() for resource in  resources]),
         'people_json': json.dumps([PersonStubSchema.from_orm(person).dict() for person in people]),
         'organizations_json': json.dumps([OrganizationStubSchema.from_orm(organization).dict() for organization in organizations]),
+        'marc_relators_json': json.dumps(MarcRelator.choices),
     })
 
 class ResourceDetailsView(DetailView):

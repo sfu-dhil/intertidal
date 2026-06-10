@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-free": "^7.1.0",
     "@videojs-player/vue": "^1.0.0",
     "@vueuse/core": "^14.1.0",
+    "@vueuse/motion": "^3.0.3",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "pinia": "^3.0.3",
