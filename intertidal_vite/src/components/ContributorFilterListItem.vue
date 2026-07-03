@@ -72,6 +72,6 @@ onUnmounted(() => {
 <style scoped>
 a {
   width: fit-content;
-  max-width: 300px;
+  max-width: 260px;
 }
 </style>

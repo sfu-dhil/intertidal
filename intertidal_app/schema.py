@@ -28,11 +28,17 @@ class OrganizationStubSchema(ModelSchema):
         ]
 
 class ResourceImageStubSchema(ModelSchema):
+    thumbnail: Optional[str]
+
     class Meta:
         model = ResourceImage
         fields = [
-            'id', 'name', 'image', 'thumbnail',
+            'id', 'name', 'image',
         ]
+
+    @staticmethod
+    def resolve_thumbnail(obj):
+        return obj.thumbnail.url if obj.thumbnail else None
 
 class ResourceAudioStubSchema(ModelSchema):
     class Meta:

@@ -148,6 +148,7 @@ class PersonAdmin(admin.ModelAdmin):
         'alternative_names',
         'links',
         'bio',
+        'image',
     ]
     list_display = ('fullname', 'citation_key', 'alternative_names')
     list_display_links = ('fullname', 'citation_key', 'alternative_names')

@@ -28,6 +28,14 @@ Intertidal Admin will be available at `http://localhost:8080/admin/`
     # U.S. Web Design Standards
     docker exec -it intertidal_app python manage.py loaddata  admin_interface_theme_uswds.json
 
+### Import existing db
+
+    docker cp intertidal.sql intertidal_db:/intertidal.sql
+    docker exec -it intertidal_db bash
+
+        psql -U intertidal -X intertidal < /intertidal.sql
+        exit
+
 ### Create your superuser
 
     docker exec -it intertidal_app python manage.py createsuperuser

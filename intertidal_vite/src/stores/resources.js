@@ -94,5 +94,7 @@ export const useResourceFilterStore = defineStore('resources-filter', {
       }
     },
   },
-  persist: true,
+  persist: {
+    storage: sessionStorage,
+  },
 })

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('intertidal', '0005_lowercase_keywords'),
+        ('intertidal_app', '0005_lowercase_keywords'),
     ]
 
     operations = [

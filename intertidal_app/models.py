@@ -6,7 +6,8 @@ from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from partial_date import PartialDateField
 from django.conf.global_settings import LANGUAGES
 from django.utils.safestring import mark_safe
-from django_advance_thumbnail import AdvanceThumbnailField
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill, ResizeToFit
 
 from .marc_relators import MarcRelator
 from .cls_types import ClsTypes
@@ -35,6 +36,19 @@ class Person(models.Model):
     alternative_names = AlternativeNamesArrayField(models.CharField(), default=list, blank=True)
     links = ArrayField(models.CharField(), default=list, blank=True)
     bio = models.TextField(blank=True)
+    image = models.ImageField(
+        verbose_name='Headshot',
+        upload_to='images/',
+        help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types" target="_blank">standard web image types</a></u>. PNG, JPEG, and WebP are recommended.'),
+        blank=True,
+        null=True,
+    )
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(800, 1000)],
+        format='AVIF',
+        options={'quality': 95},
+    )
 
     # relationships
     # one-to-many responsibility_statements via PersonResponsibilityStatement Model
@@ -44,6 +58,7 @@ class Person(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = 'intertidal_person'
         verbose_name_plural = 'people'
 
     def get_alternative_names_short(self):
@@ -67,6 +82,9 @@ class Organization(models.Model):
     # write tracking fields
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'intertidal_organization'
 
     def get_alternative_names_short(self):
         alternative_names = ', '.join(self.alternative_names) if len(self.alternative_names) else None
@@ -203,6 +221,9 @@ class Resource(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'intertidal_resource'
+
     def date_str(self):
         if not self.date:
             return None
@@ -283,6 +304,9 @@ class Edition(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'intertidal_edition'
+
     def __str__(self):
         return f"{self.name} ({self.date})" if self.date else self.name
 
@@ -337,6 +361,7 @@ class Occurrence(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = 'intertidal_occurrence'
         verbose_name = "Special Occurrence"
 
     def date_str(self):
@@ -393,6 +418,9 @@ class ResourceAudio(models.Model):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        db_table = 'intertidal_resourceaudio'
+
     def __str__(self):
         return self.name
 
@@ -400,24 +428,13 @@ class ResourceImage(models.Model):
     name = models.CharField(verbose_name='File Name', blank=True)
     image = models.ImageField(
         upload_to='images/',
-        width_field='image_width',
-        height_field='image_height',
         help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types" target="_blank">standard web image types</a></u>. PNG, JPEG, and WebP are recommended.'),
     )
-    image_width = models.IntegerField(
-        null=True,
-        blank=True,
-    )
-    image_height = models.IntegerField(
-        null=True,
-        blank=True,
-    )
-    thumbnail = AdvanceThumbnailField(
-        source_field='image',
-        upload_to='thumbnails/',
-        null=True,
-        blank=True,
-        size=(520, 520),
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(1920, 1080)],
+        format='AVIF',
+        options={'quality': 95},
     )
 
     # write tracking fields
@@ -430,6 +447,9 @@ class ResourceImage(models.Model):
         related_name='images',
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        db_table = 'intertidal_resourceimage'
 
     def __str__(self):
         return self.name

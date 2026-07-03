@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('intertidal', '0004_remove_organization_emails_remove_person_emails_and_more'),
+        ('intertidal_app', '0004_remove_organization_emails_remove_person_emails_and_more'),
     ]
 
     operations = [
