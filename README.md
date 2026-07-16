@@ -103,13 +103,13 @@ Create new migrations
 ### Yarn (javascript)
 
     # add new package
-    docker exec -it intertidal_vite yarn add [package]
+    docker run --rm --workdir /app --volume ${PWD}/intertidal_vite:/app node:25.5 yarn add [package]
 
     # update a package
-    docker exec -it intertidal_vite yarn upgrade [package]
+    docker run --rm --workdir /app --volume ${PWD}/intertidal_vite:/app node:25.5 yarn upgrade [package]
 
     # update all packages
-    docker exec -it intertidal_vite yarn upgrade
+    docker run --rm --workdir /app --volume ${PWD}/intertidal_vite:/app node:25.5 yarn upgrade
 
 After you update a dependency make sure to rebuild the images
 

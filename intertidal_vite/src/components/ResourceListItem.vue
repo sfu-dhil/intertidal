@@ -2,9 +2,6 @@
 import { useTemplateRef, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useResourceFilterStore } from '../stores/resources.js'
-import { LocaleTypes } from '../helpers/localeTypes.js'
-import { CategoryTypes } from '../helpers/categoryTypes.js'
-import { ClsTypes } from '../helpers/clsTypes.js'
 import { useElementBounding } from '@vueuse/core'
 
 const props = defineProps({
@@ -20,19 +17,6 @@ const {
 } = storeToRefs(resourceFilterStore)
 
 const resourceCoordinateMap = defineModel('resourceCoordinateMap', { default: new Map() })
-// const resourceDataStore = useResourceStore()
-// const {
-//   personMap,
-//   marcRelatorsMap,
-// } = storeToRefs(resourceDataStore)
-// const languageNames = new Intl.DisplayNames(["en"], { type: "language" })
-// const dateRange = computed(() => {
-//   const dateParts = []
-//   if (props.resource.date) { dateParts.push(props.resource.date) }
-//   if (props.resource.date_current) { dateParts.push('Current') }
-//   if (!props.resource.date_current && props.resource.date_end) { dateParts.push(props.resource.date_end) }
-//   return dateParts.join(' - ')
-// })
 
 const itemEl = useTemplateRef('itemEl')
 const { top, height, left, right, update: updateElementBounding } = useElementBounding(itemEl)
@@ -83,23 +67,6 @@ onUnmounted(() => {
         </svg>
       </a>
     </div>
-<!--
-    <span v-if="resource.locale" class="badge text-bg-primary me-1" :title="`Locale: ${LocaleTypes[resource.locale]}`">{{ LocaleTypes[resource.locale] }}</span>
-    <span v-if="resource.language" class="badge text-bg-primary me-1" :title="`Language: ${languageNames.of(resource.language)}`">{{ languageNames.of(resource.language) }}</span>
-    <span v-for="category in resource.categories" class="badge text-bg-primary me-1" :title="`Category: ${CategoryTypes[category]}`">{{ CategoryTypes[category] }}</span>
-    <span v-for="form in resource.forms" class="badge text-bg-primary me-1" :title="`Physical/Digital Form: ${ClsTypes[form]}`">{{ ClsTypes[form] }}</span>
-    <br /> {{ dateRange }}
-    <br /> -->
-    <!-- <span v-for="(statement, statementIndex) in resource.person_responsibility_statements">
-      <a href="javascript:void(0)"
-        class="link-offset-2 link-underline link-light link-underline-opacity-50 link-underline-opacity-100-hover"
-      >{{ personMap.get(statement.person).label }}</a>&nbsp;
-      <span
-        v-for="(marc_relator, index) in statement.marc_relators" class="badge text-bg-primary"
-        :class="{'ms-1': index > 0}"
-        :title="`Role: ${marcRelatorsMap.get(marc_relator)}`"
-      >{{ marcRelatorsMap.get(marc_relator) }}</span>{{ statementIndex < resource.person_responsibility_statements.length - 1 ? ', ' : '' }}
-    </span> -->
   </div>
 </template>
 

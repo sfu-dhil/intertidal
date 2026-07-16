@@ -11,6 +11,30 @@
         {% endfor %}
         <hr />
 
+        {% if object.audios.all|length > 0 %}
+            <h2 class="h3">Audio Recordings</h2>
+            {% for audio in object.audios.all %}
+                <div class="card mb-5">
+                    <div class="card-header">
+                        {{ audio.name }}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item list-group-item-action">
+                            <div class="shikwasa-player-app" data-src="{{ audio.audio.url }}" data-title="{{ audio.name }}"></div>
+                        </li>
+                        {% if audio.transcript %}
+                            <li class="list-group-item list-group-item-action">
+                                <div class="fw-bold">Transcripts</div>
+                                <div class="resource_transcripts">
+                                    {{ audio.transcript|safe }}
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <div class="card mb-5">
             <div class="card-header">Resource Details</div>
             <ul class="list-group list-group-flush">
@@ -99,6 +123,7 @@
                 {% endfor %}
             </div>
         {% endif %}
+
 
         {% if object.editions.all|length > 0 %}
         <h2 class="h3">Editions</h2>

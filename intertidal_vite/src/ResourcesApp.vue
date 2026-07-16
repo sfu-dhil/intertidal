@@ -3,8 +3,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useResourceFilterStore, useResourceStore } from './stores/resources.js'
 import ContributorFilterListItem from './components/ContributorFilterListItem.vue'
-import { LocaleTypes } from './helpers/localeTypes.js'
-import { CategoryTypes } from './helpers/categoryTypes.js'
+import { CategoryTypes, LocaleTypes } from './_resourceTypes.js'
 import ResourceListItem from './components/ResourceListItem.vue'
 import CategoryFilterListItem from './components/CategoryFilterListItem.vue'
 import ConnectionsCanvas from './components/ConnectionsCanvas.vue'
@@ -56,6 +55,8 @@ watch(selectedKey, (newValue) => {
 
 const entityHoverKey = ref(null)
 const filteredResources = computed(() => resources.value.filter((o) => {
+  // filter all ROUNDTABLE_INTERVIEW (Roundtable/Interview). It is displayed elsewhere
+  if (o.category_set.has('ROUNDTABLE_INTERVIEW')) { return false }
   if (selectedType.value === 'person' && !o.person_id_set.has(selectedValue.value)) { return false }
   if (selectedType.value === 'organization' && !o.organization_id_set.has(selectedValue.value)) { return false }
   if (selectedType.value === 'locale' && o.locale !== selectedValue.value) { return false }

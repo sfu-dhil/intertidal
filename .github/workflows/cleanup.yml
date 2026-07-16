@@ -1,0 +1,23 @@
+name: Cleanup Old Untagged ghcr.io Images
+
+on:
+  # Runs every Saturday@3:00am
+  schedule:
+  - cron: '0 3 * * 6'
+    timezone: 'America/Vancouver'
+  # Allows manual triggering
+  workflow_dispatch:
+
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+    - name: Delete untagged images older than 90 days
+      uses: dataaxiom/ghcr-cleanup-action@v1
+      with:
+        delete-untagged: true
+        older-than: 90 days
+        validate: true

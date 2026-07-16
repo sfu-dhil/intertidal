@@ -7,6 +7,7 @@ import BackdropMediaApp from './BackdropMediaApp.vue'
 import VideoPlayer from '@videojs-player/vue'
 import ResourcesApp from './ResourcesApp.vue'
 import MapFilterApp from './MapFilterApp.vue'
+import AudioPlayerApp from './AudioPlayerApp.vue'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -21,9 +22,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 // make sure videojs plugins are working
 import 'video.js'
 import 'videojs-theme-kit/videojs-skin.min.js'
-
-// shikwasa
-import { Player } from 'shikwasa'
 
 const ready = (fn) => document.readyState !== 'loading' ? fn() : document.addEventListener('DOMContentLoaded', fn)
 ready(() => {
@@ -53,25 +51,11 @@ ready(() => {
     app.mount(mountEl)
   })
 
-
-  const shikwasaPlayers = []
-  document.querySelectorAll('.shikwasa-player-app').forEach((mountEl) => {
-    shikwasaPlayers.push(new Player({
-      container: mountEl,
-      audio: {
-        // {src, title, artist, cover, }
-        ...mountEl.dataset,
-      },
-      theme: 'dark',
-      themeColor: 'rgb(85,185,243)',
-      fixed: {
-        type: 'static',
-      },
-      autoplay: false,
-      muted: false,
-      preload: 'metadata',
-      download: true,
-    }))
+  document.querySelectorAll('.audio-player-app').forEach((mountEl) => {
+    const app = createApp(AudioPlayerApp, {
+      playlist: mountEl.dataset.playlistJson ? JSON.parse(mountEl.dataset.playlistJson) : [],
+    })
+    app.use(pinia)
+    app.mount(mountEl)
   })
-
 })

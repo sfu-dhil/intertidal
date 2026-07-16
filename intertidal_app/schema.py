@@ -60,7 +60,7 @@ class OrganizationResponsibilityStatementsStubSchema(ModelSchema):
             'organization', 'marc_relators',
         ]
 
-class ResourceStubSchema(ModelSchema):
+class ResourceSchema(ModelSchema):
     person_ids: List[int] = []
     organization_ids: List[int] = []
     images: List[ResourceImageStubSchema] = []

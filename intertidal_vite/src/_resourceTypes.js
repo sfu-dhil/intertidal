@@ -1,3 +1,20 @@
+export const CategoryTypes = Object.freeze({
+  LITERARY_WORK: 'Literary Work',
+  ART_PERFORMANCE: 'Art/Performance',
+  STATE_ARCHITECTURE_MISC: 'State/Architecture/Misc.',
+  NEWS_DOCUMENTARY: 'News/Documentary',
+  ACADEMIC_RESEARCH: 'Academic Research',
+  SOCIAL_MEDIA: 'Social Media',
+  ROUNDTABLE_INTERVIEW: 'Roundtable/Interview',
+  FIELD_RECORDING: 'Field Recording',
+})
+
+export const LocaleTypes = Object.freeze({
+  VANCOUVER: 'Vancouver',
+  SINGAPORE: 'Singapore',
+  HONG_KONG: 'Hong Kong',
+})
+
 export const ClsTypes = Object.freeze({
   article: 'Article',
   article_journal: 'Article Journal',
@@ -44,4 +61,4 @@ export const ClsTypes = Object.freeze({
   thesis: 'Thesis',
   treaty: 'Treaty',
   webpage: 'Webpage',
-});
+})

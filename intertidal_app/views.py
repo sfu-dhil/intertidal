@@ -3,10 +3,11 @@ import json
 from django.views.generic import TemplateView, DetailView, ListView
 from django.templatetags.static import static
 from django.shortcuts import render
+from django.urls import reverse
 
 from .marc_relators import MarcRelator
-from .models import Resource, Person, Organization
-from .schema import ResourceStubSchema, PersonStubSchema, OrganizationStubSchema
+from .models import Resource, Person, Organization, ResourceAudio
+from .schema import ResourceSchema, PersonStubSchema, OrganizationStubSchema
 
 
 def home(request):
@@ -27,10 +28,23 @@ def mockup(request):
     ).order_by('name').all()
     people = Person.objects.order_by('fullname').all()
     organizations = Organization.objects.order_by('name').all()
+    playlist = [
+        {
+            'url': static('audio/intertidal_draft_ambient_soundscape.ogg'),
+            'title': 'Ambient Soundscape',
+            'artist': 'test',
+        },
+        {
+            'url': static('audio/intertidal_draft_ambient_soundscape.ogg'),
+            'title': 'Mockup Test Resource [to be remove]',
+            'artist': 'test 2',
+            'resource_url': reverse('resource-details', kwargs={'pk': 339}),
+        },
+    ]
 
     return render(request, f'mockup.html', {
-        'resources': resources,
-        'resources_json': json.dumps([ResourceStubSchema.from_orm(resource).dict() for resource in  resources]),
+        'playlist_json': json.dumps(playlist),
+        'resources_json': json.dumps([ResourceSchema.from_orm(resource).dict() for resource in resources]),
         'people_json': json.dumps([PersonStubSchema.from_orm(person).dict() for person in people]),
         'organizations_json': json.dumps([OrganizationStubSchema.from_orm(organization).dict() for organization in organizations]),
         'marc_relators_json': json.dumps(MarcRelator.choices),
@@ -39,6 +53,11 @@ def mockup(request):
 class ResourceDetailsView(DetailView):
     model = Resource
     template_name = 'resourceDetails.html'
+
+    def get_template_names(self):
+        if Resource.CategoryTypes.ROUNDTABLE_INTERVIEW in self.object.categories:
+            return ['resourceRoundtableInterviewDetails.html']
+        return super().get_template_names()
 
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).prefetch_related(
