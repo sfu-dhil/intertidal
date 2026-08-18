@@ -11,7 +11,6 @@
         <title>Intertidal</title>
         <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 
-        {% vite_react_refresh %}
         {% vite_hmr_client %}
         {% vite_asset 'intertidal.js' crossorigin="" %}
         {% block styles %}
@@ -39,6 +38,8 @@
                         {% endif %}
                     </div>
                 </div>
+                {% block footer_extra %}
+                {% endblock %}
             </div>
         </footer>
         {% block backdrop_media_app %}

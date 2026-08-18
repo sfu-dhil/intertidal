@@ -21,64 +21,66 @@ const redraw = () => {
   if (!drawing && canvasEl.value) {
     drawing = true
     requestAnimationFrame(() => {
-      const ctx = canvasEl.value.getContext("2d")
-      // clear canvas
-      ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height)
-      for (const [resourceId, resourceCoordinates] of resourceCoordinateMap.value) {
-        const resource = useResourceStore().getResource(resourceId)
-        const {left: resourceLeft, right: resourceRight, y: resourceY} = resourceCoordinates
+      if (canvasEl.value) {
+        const ctx = canvasEl.value.getContext("2d")
+        // clear canvas
+        ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height)
+        for (const [resourceId, resourceCoordinates] of resourceCoordinateMap.value) {
+          const resource = useResourceStore().getResource(resourceId)
+          const {left: resourceLeft, right: resourceRight, y: resourceY} = resourceCoordinates
 
-        for (const [category, categoryCoordinates] of categoryCoordinateMap.value) {
-          const categoryKey = `category_${category}`
-          const {left: categoryLeft, y: categoryY} = categoryCoordinates
-          if (resource.category_set.has(category)) {
-            const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === categoryKey || selectedKey.value === categoryKey
-            ctx.lineWidth = isHighlighted ? 2 : 1
-            ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
-            ctx.fillStyle = 'grey'
-            ctx.beginPath()
-            ctx.moveTo(resourceRight, resourceY)
-            // ctx.bezierCurveTo(
-            //   resourceRight + ((categoryLeft - resourceRight) * 3 / 4), resourceY,
-            //   resourceRight + ((categoryLeft - resourceRight) * 1 / 4), categoryY,
-            //   categoryLeft, categoryY
-            // )
-            ctx.bezierCurveTo(
-              resourceRight + ((categoryLeft - resourceRight) / 2), resourceY,
-              resourceRight + ((categoryLeft - resourceRight) / 2), categoryY,
-              categoryLeft, categoryY
-            )
-            ctx.stroke()
+          for (const [category, categoryCoordinates] of categoryCoordinateMap.value) {
+            const categoryKey = `category_${category}`
+            const {left: categoryLeft, y: categoryY} = categoryCoordinates
+            if (resource.category_set.has(category)) {
+              const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === categoryKey || selectedKey.value === categoryKey
+              ctx.lineWidth = isHighlighted ? 2 : 1
+              ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
+              ctx.fillStyle = 'grey'
+              ctx.beginPath()
+              ctx.moveTo(resourceRight, resourceY)
+              // ctx.bezierCurveTo(
+              //   resourceRight + ((categoryLeft - resourceRight) * 3 / 4), resourceY,
+              //   resourceRight + ((categoryLeft - resourceRight) * 1 / 4), categoryY,
+              //   categoryLeft, categoryY
+              // )
+              ctx.bezierCurveTo(
+                resourceRight + ((categoryLeft - resourceRight) / 2), resourceY,
+                resourceRight + ((categoryLeft - resourceRight) / 2), categoryY,
+                categoryLeft, categoryY
+              )
+              ctx.stroke()
 
-            // ctx.fillStyle = "blue"
-            // ctx.beginPath()
-            // ctx.arc(resourceRight, resourceY, 5, 0, 2 * Math.PI)
-            // ctx.arc(categoryLeft, categoryY, 5, 0, 2 * Math.PI)
-            // ctx.fill()
+              // ctx.fillStyle = "blue"
+              // ctx.beginPath()
+              // ctx.arc(resourceRight, resourceY, 5, 0, 2 * Math.PI)
+              // ctx.arc(categoryLeft, categoryY, 5, 0, 2 * Math.PI)
+              // ctx.fill()
 
-            // ctx.fillStyle = "red"
-            // ctx.beginPath()
-            // ctx.arc(resourceRight + ((categoryLeft - resourceRight) * 3 / 4), resourceY, 5, 0, 2 * Math.PI)
-            // ctx.arc(resourceRight + ((categoryLeft - resourceRight) * 1 / 4), categoryY, 5, 0, 2 * Math.PI)
-            // ctx.fill()
+              // ctx.fillStyle = "red"
+              // ctx.beginPath()
+              // ctx.arc(resourceRight + ((categoryLeft - resourceRight) * 3 / 4), resourceY, 5, 0, 2 * Math.PI)
+              // ctx.arc(resourceRight + ((categoryLeft - resourceRight) * 1 / 4), categoryY, 5, 0, 2 * Math.PI)
+              // ctx.fill()
+            }
           }
-        }
-        for (const [entityKey, collaboratorCoordinates] of collaboratorCoordinateMap.value) {
-          const {right: collaboratorRight, y: collaboratorY} = collaboratorCoordinates
-          const personId = entityKey.startsWith('person_') ? parseInt(entityKey.slice('person_'.length)) : null
-          const organizationId = entityKey.startsWith('organization_') ? parseInt(entityKey.slice('organization_'.length)) : null
-          if ((personId && resource.person_id_set.has(personId)) || (organizationId && resource.organization_id_set.has(organizationId))) {
-            const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === entityKey || selectedKey.value === entityKey
-            ctx.lineWidth = isHighlighted ? 2 : 1
-            ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
-            ctx.beginPath()
-            ctx.moveTo(resourceLeft, resourceY)
-            ctx.bezierCurveTo(
-              resourceLeft - ((resourceLeft - collaboratorRight) / 2), resourceY,
-              resourceLeft - ((resourceLeft - collaboratorRight) / 2), collaboratorY,
-              collaboratorRight, collaboratorY
-            )
-            ctx.stroke()
+          for (const [entityKey, collaboratorCoordinates] of collaboratorCoordinateMap.value) {
+            const {right: collaboratorRight, y: collaboratorY} = collaboratorCoordinates
+            const personId = entityKey.startsWith('person_') ? parseInt(entityKey.slice('person_'.length)) : null
+            const organizationId = entityKey.startsWith('organization_') ? parseInt(entityKey.slice('organization_'.length)) : null
+            if ((personId && resource.person_id_set.has(personId)) || (organizationId && resource.organization_id_set.has(organizationId))) {
+              const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === entityKey || selectedKey.value === entityKey
+              ctx.lineWidth = isHighlighted ? 2 : 1
+              ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
+              ctx.beginPath()
+              ctx.moveTo(resourceLeft, resourceY)
+              ctx.bezierCurveTo(
+                resourceLeft - ((resourceLeft - collaboratorRight) / 2), resourceY,
+                resourceLeft - ((resourceLeft - collaboratorRight) / 2), collaboratorY,
+                collaboratorRight, collaboratorY
+              )
+              ctx.stroke()
+            }
           }
         }
       }
@@ -87,8 +89,10 @@ const redraw = () => {
   }
 }
 const setupCanvas = () => {
-  canvasEl.value.width = canvasWrapperEl.value.clientWidth
-  canvasEl.value.height = canvasWrapperEl.value.clientHeight
+  if (canvasEl.value) {
+    canvasEl.value.width = canvasWrapperEl.value.clientWidth
+    canvasEl.value.height = canvasWrapperEl.value.clientHeight
+  }
   redraw()
 }
 let animatedRedrawTimeouts = []

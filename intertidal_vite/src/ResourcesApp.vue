@@ -1,12 +1,16 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { breakpointsBootstrapV5, useBreakpoints } from '@vueuse/core'
 import { useResourceFilterStore, useResourceStore } from './stores/resources.js'
 import ContributorFilterListItem from './components/ContributorFilterListItem.vue'
 import { CategoryTypes, LocaleTypes } from './_resourceTypes.js'
 import ResourceListItem from './components/ResourceListItem.vue'
 import CategoryFilterListItem from './components/CategoryFilterListItem.vue'
 import ConnectionsCanvas from './components/ConnectionsCanvas.vue'
+
+const breakpoints = useBreakpoints(breakpointsBootstrapV5)
+const isLargeScreen = breakpoints.greaterOrEqual('xl')
 
 const props = defineProps({
   resources: {
@@ -46,11 +50,55 @@ const {
   selectedValue,
 } = storeToRefs(resourceFilterStore)
 
+const dropdownContributorSelectedKey = ref(null)
+watch(dropdownContributorSelectedKey, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue && selectedKey.value !== newValue) {
+    const organizationPrefix = 'organization_'
+    const personPrefix = 'person_'
+    if (newValue.startsWith(organizationPrefix)) {
+      useResourceFilterStore().selectOrganization(parseInt(newValue.slice(organizationPrefix.length)))
+    } else if (newValue.startsWith(personPrefix)) {
+      useResourceFilterStore().selectPerson(parseInt(newValue.slice(personPrefix.length)))
+    }
+  }
+})
+const dropdownCategorySelectedKey = ref(null)
+watch(dropdownCategorySelectedKey, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue && selectedKey.value !== newValue) {
+    const categoryPrefix = 'category_'
+    if (newValue.startsWith(categoryPrefix)) {
+      useResourceFilterStore().selectCategory(newValue.slice(categoryPrefix.length))
+    }
+  }
+})
+const resetDropdownFilters = () => {
+  if (selectedValue.value) {
+    if (['organization', 'person'].includes(selectedType.value) ) {
+      dropdownContributorSelectedKey.value = selectedKey.value
+      dropdownCategorySelectedKey.value = null
+    } else if (selectedType.value === 'category') {
+      dropdownContributorSelectedKey.value = null
+      dropdownCategorySelectedKey.value = selectedKey.value
+    }
+  } else {
+    dropdownContributorSelectedKey.value = null
+    dropdownCategorySelectedKey.value = null
+  }
+}
+const dropdownClearSelected = () => {
+  useResourceFilterStore().reset()
+  dropdownContributorSelectedKey.value = null
+  dropdownCategorySelectedKey.value = null
+}
+
 const resourcesHeaderRef = ref(null)
 
 const scrollToTopOfResources = () => resourcesHeaderRef.value?.scrollIntoView({ behavior: 'instant', block: 'start' })
-watch(selectedKey, (newValue) => {
-  if (newValue) { nextTick(scrollToTopOfResources) }
+watch(selectedKey, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    if (newValue) { nextTick(scrollToTopOfResources) }
+    resetDropdownFilters()
+  }
 })
 
 const entityHoverKey = ref(null)
@@ -68,15 +116,15 @@ const visibleResourceIds = computed(() => Array.from(resourceCoordinateMap.value
 
 const collaboratorCoordinateMap = ref(new Map())
 const rankedCollaboratorMap = computed(() => {
-  const collaboratorReferences = new Map()
+  const references = new Map()
   visibleResourceIds.value.forEach( (resource_id) => {
     const resource = useResourceStore().resourceMap.get(resource_id)
     if (resource) {
-      resource.person_ids.forEach((id) => collaboratorReferences.set(`person_${id}`, (collaboratorReferences.get(`person_${id}`) ?? 0) + 1 ))
-      resource.organization_ids.forEach((id) => collaboratorReferences.set(`organization_${id}`, (collaboratorReferences.get(`organization_${id}`) ?? 0) + 1 ))
+      resource.person_ids.forEach((id) => references.set(`person_${id}`, (references.get(`person_${id}`) ?? 0) + 1 ))
+      resource.organization_ids.forEach((id) => references.set(`organization_${id}`, (references.get(`organization_${id}`) ?? 0) + 1 ))
     }
   })
-  return [...collaboratorReferences.entries()]
+  return [...references.entries()]
     .filter((a) => a[1] > 0)
     .sort((a, b) => {
       // prioritize selected in case everything has equal references
@@ -96,17 +144,33 @@ const contributorList = computed(() =>
     ...organizations.value.filter((o) => rankedCollaboratorMap.value.has(`organization_${o.id}`)).map((o) => ({...o, key: `organization_${o.id}`, rank: rankedCollaboratorMap.value.get(`organization_${o.id}`), active: selectedKey.value === `organization_${o.id}`}))
   ].sort((a, b) => `${a.label}`.localeCompare(b.label))
 )
+const collaboratorReferencesMap = computed(() => {
+  const references = new Map()
+  resources.value.filter((o) => !o.category_set.has('ROUNDTABLE_INTERVIEW')).forEach( (resource) => {
+    resource.person_ids.forEach((id) => references.set(`person_${id}`, (references.get(`person_${id}`) ?? 0) + 1 ))
+    resource.organization_ids.forEach((id) => references.set(`organization_${id}`, (references.get(`organization_${id}`) ?? 0) + 1 ))
+  })
+  return [...references.entries()]
+    .filter((a) => a[1] > 0)
+    .reduce((result, a) => result.set(a[0], a[1]), new Map())
+})
+const dropdownContributorList = computed(() =>
+  [
+    ...people.value.filter((o) => collaboratorReferencesMap.value.has(`person_${o.id}`)).map((o) => ({...o, key: `person_${o.id}`})),
+    ...organizations.value.filter((o) => collaboratorReferencesMap.value.has(`organization_${o.id}`)).map((o) => ({...o, key: `organization_${o.id}`}))
+  ].sort((a, b) => `${a.label}`.localeCompare(b.label))
+)
 
 const categoryCoordinateMap = ref(new Map())
 const rankedCategoryMap = computed(() => {
-  const category_references = new Map()
+  const references = new Map()
   visibleResourceIds.value.forEach( (resource_id) => {
     const resource = useResourceStore().resourceMap.get(resource_id)
     if (resource) {
-      resource.categories.forEach((category) => category_references.set(category, (category_references.get(category) ?? 0) + 1 ))
+      resource.categories.forEach((category) => references.set(category, (references.get(category) ?? 0) + 1 ))
     }
   })
-  return [...category_references.entries()]
+  return [...references.entries()]
     .filter((a) => a[1] > 0)
     .sort((a, b) => {
       // prioritize selected in case everything has equal references
@@ -121,18 +185,32 @@ const rankedCategoryMap = computed(() => {
     .reduce((result, a) => result.set(a[0], a[1]), new Map())
 })
 const categoryList = computed(() => categories.value.filter((category) => rankedCategoryMap.value.has(category)).map((category) => ({label: CategoryTypes[category], id: category, key: `category_${category}`, rank: rankedCategoryMap.value.get(category), active: selectedKey.value === `category_${category}`})))
+const categoryReferenceMap = computed(() => {
+  const references = new Map()
+  resources.value.filter((o) => !o.category_set.has('ROUNDTABLE_INTERVIEW')).forEach( (resource) => {
+    resource.categories.forEach((category) => references.set(category, (references.get(category) ?? 0) + 1 ))
+  })
+  return [...references.entries()]
+    .filter((a) => a[1] > 0)
+    .reduce((result, a) => result.set(a[0], a[1]), new Map())
+})
+const dropdownCategoryList = computed(() => categories.value.filter((category) => categoryReferenceMap.value.has(category)).map((category) => ({label: CategoryTypes[category], key: `category_${category}`})))
+onMounted(() => {
+  resetDropdownFilters()
+})
 </script>
 
 <template>
   <div class="position-relative">
     <ConnectionsCanvas class="z-1"
+      v-if="isLargeScreen"
       v-model:entityHoverKey="entityHoverKey"
       v-model:resourceCoordinateMap="resourceCoordinateMap"
       v-model:collaboratorCoordinateMap="collaboratorCoordinateMap"
       v-model:categoryCoordinateMap="categoryCoordinateMap"
     />
     <div class="app-resource-viz-wrapper position-relative z-2 d-flex justify-content-center">
-      <div class="sticky-top py-3 px-5 ms-5 h-100 text-start contributor-filter-wrapper">
+      <div class="sticky-top py-3 px-5 ms-5 h-100 text-start contributor-filter-wrapper" v-if="isLargeScreen">
         <h2 class="h2">Contributors</h2>
         <nav class="nav flex-column nav-filter-list">
           <ContributorFilterListItem v-for="contributor in contributorList" :key="contributor.key"
@@ -142,7 +220,9 @@ const categoryList = computed(() => categories.value.filter((category) => ranked
           />
         </nav>
       </div>
-      <div class="mx-5 px-0 h-100 resource-list-wrapper">
+      <div class="px-0 h-100 flex-grow-1 resource-list-wrapper"
+        :class="{ 'w-100': !isLargeScreen }"
+      >
         <h2 ref="resourcesHeaderRef" class="resource-heading h4 text-center">
           <span v-if="selectedType === 'locale'">
             <span class="btn-link fw-bold" @click="useResourceFilterStore().reset()">{{ LocaleTypes[selectedValue] }}</span>
@@ -162,6 +242,28 @@ const categoryList = computed(() => categories.value.filter((category) => ranked
           </span>
           <span v-if="!selectedType">All Resources</span>
         </h2>
+        <div class="d-flex mt-3" v-if="!isLargeScreen">
+          <Multiselect
+            v-model="dropdownContributorSelectedKey"
+            :options="dropdownContributorList.map((o) => o.key)" :custom-label="(key) => dropdownContributorList.find((o) => o.key === key)?.label"
+            :close-on-select="true" placeholder="Select a Contributor" :show-labels="false"
+            class="me-2"
+          >
+            <template #clear="props">
+              <i class="bi bi-x-lg fw-bold fs-6 multiselect__clear" title="Clear" v-if="dropdownContributorSelectedKey" @mousedown.prevent.stop="dropdownClearSelected()"></i>
+            </template>
+          </Multiselect>
+          <Multiselect
+            v-model="dropdownCategorySelectedKey"
+            :options="dropdownCategoryList.map((o) => o.key)" :custom-label="(key) => dropdownCategoryList.find((o) => o.key === key)?.label"
+            :close-on-select="true" placeholder="Select a Category" :show-labels="false"
+            class="ms-2"
+          >
+            <template #clear="props">
+              <i class="bi bi-x-lg fw-bold fs-6 multiselect__clear" title="Clear" v-if="dropdownCategorySelectedKey" @mousedown.prevent.stop="dropdownClearSelected()"></i>
+            </template>
+          </Multiselect>
+        </div>
         <hr />
         <ResourceListItem v-for="resource in filteredResources" :key="resource.id"
           :resource="resource" v-model:resourceCoordinateMap="resourceCoordinateMap"
@@ -169,7 +271,7 @@ const categoryList = computed(() => categories.value.filter((category) => ranked
           @mouseleave="() => entityHoverKey = null"
         />
       </div>
-      <div class="sticky-top py-3 px-5 me-5 h-100 text-end category-filter-wrapper">
+      <div class="sticky-top py-3 px-5 me-5 h-100 text-end category-filter-wrapper" v-if="isLargeScreen">
         <h2 class="h2">Categories</h2>
         <nav class="nav flex-column nav-filter-list">
           <CategoryFilterListItem v-for="category in categoryList" :key="category.key"
@@ -195,8 +297,5 @@ const categoryList = computed(() => categories.value.filter((category) => ranked
 .contributor-filter-wrapper,
 .category-filter-wrapper {
   width: 400px !important;
-}
-.resource-list-wrapper {
-  width: 800px !important;
 }
 </style>

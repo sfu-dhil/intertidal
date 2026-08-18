@@ -13,6 +13,9 @@
 // waveform-player
 @import '@arraypress/waveform-player/dist/waveform-player.css';
 
+// vue-multiselect
+@import 'vue-multiselect/dist/vue-multiselect.min.css';
+
 html,
 body {
     height: 100%;
@@ -29,4 +32,21 @@ body {
 }
 .shk-main {
     max-width: 100%;
+}
+
+.multiselect__tags {
+  padding-right: 4em !important;
+}
+.multiselect__input {
+  color: #35495e !important;
+}
+.multiselect__clear {
+  cursor: pointer;
+  display: inline-block;
+  position: absolute;
+  top: 0.5em;
+  right: 2em;
+}
+.multiselect__placeholder {
+  padding: 0px 0px 0px 5px;
 }

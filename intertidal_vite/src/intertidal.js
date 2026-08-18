@@ -2,6 +2,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import Multiselect from 'vue-multiselect'
 import { MotionPlugin } from '@vueuse/motion'
 import BackdropMediaApp from './BackdropMediaApp.vue'
 import VideoPlayer from '@videojs-player/vue'
@@ -41,6 +42,7 @@ ready(() => {
     })
     app.use(pinia)
     app.use(MotionPlugin)
+    app.component('Multiselect', Multiselect)
     app.mount(mountEl)
   })
 
