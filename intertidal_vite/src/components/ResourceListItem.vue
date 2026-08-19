@@ -1,7 +1,7 @@
 <script setup>
 import { useTemplateRef, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useResourceFilterStore } from '../stores/resources.js'
+import { useResourcesFilterStore } from '../stores/display.js'
 import { useElementBounding } from '@vueuse/core'
 
 const props = defineProps({
@@ -11,10 +11,9 @@ const props = defineProps({
   },
 })
 
-const resourceFilterStore = useResourceFilterStore()
 const {
   selectedKey,
-} = storeToRefs(resourceFilterStore)
+} = storeToRefs(useResourcesFilterStore())
 
 const resourceCoordinateMap = defineModel('resourceCoordinateMap', { default: new Map() })
 
@@ -51,10 +50,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="itemEl" class="card mb-5" v-motion-slide-visible-once-bottom>
+  <div ref="itemEl" class="card mb-3">
     <img
-      v-if="resource.images.length > 0 && resource.images[0].thumbnail"
-      :src="resource.images[0].thumbnail" :alt="resource.images[0].name"
+      v-if="resource.thumbnail"
+      :src="resource.thumbnail" :alt="resource.name"
       class="card-img-top object-fit-cover w-100"
     >
     <div class="card-body">

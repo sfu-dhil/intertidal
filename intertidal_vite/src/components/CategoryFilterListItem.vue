@@ -1,13 +1,12 @@
 <script setup>
 import { useTemplateRef, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useResourceFilterStore } from '../stores/resources.js'
+import { useResourcesFilterStore } from '../stores/display.js'
 import { useElementBounding } from '@vueuse/core'
 
-const resourceFilterStore = useResourceFilterStore()
 const {
   selectedKey,
-} = storeToRefs(resourceFilterStore)
+} = storeToRefs(useResourcesFilterStore())
 
 const props = defineProps({
   category: {
@@ -38,7 +37,7 @@ watch(selectedKey, (newValue, oldValue) => {
 const fontSize = computed(() => {
   return 1.0 + Math.min((props.category.rank-1)/8, 0.5)
 })
-const updateSelected = () => useResourceFilterStore().selectCategory(props.category.id)
+const updateSelected = () => useResourcesFilterStore().selectCategory(props.category.id)
 
 const updateCoordinates = () => {
   if (top.value + height.value >= 0 && top.value <= window.innerHeight) {
@@ -56,24 +55,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <a ref="itemEl" v-motion-slide-visible-once-right
-    class="nav-link ms-auto px-0 text-truncate" role="button"
-    :class="{
-      'active': category.active,
-      'fw-bold': category.active,
-      'text-decoration-underline': category.active,
-      'text-light-emphasis': category.active,
-      'text-light': !category.active,
-    }"
-    :style="{ 'font-size': `${fontSize}em` }"
-    @click="updateSelected"
-    :title="category.label"
-  >{{ category.label }}</a>
+  <li class="nav-item">
+    <a ref="itemEl" v-motion-slide-right
+      class="nav-link ms-auto px-0 text-truncate" role="button"
+      :class="{
+        'active': category.active,
+        'fw-bold': category.active,
+        'text-decoration-underline': category.active,
+        'text-light-emphasis': category.active,
+        'text-light': !category.active,
+      }"
+      :style="{ 'font-size': `${fontSize}em` }"
+      @click="updateSelected"
+      :title="category.label"
+    >{{ category.label }}</a>
+  </li>
 </template>
 
 <style scoped>
-a {
-  width: fit-content;
-  max-width: 260px;
+li {
+  width: 300px;
+  a {
+    width: fit-content;
+    max-width: 300px;
+  }
 }
 </style>

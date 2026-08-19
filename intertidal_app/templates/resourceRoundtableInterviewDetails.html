@@ -12,31 +12,48 @@
         <hr />
 
         {% if object.audios.all|length > 0 %}
-            <h2 class="h3">Audio Recordings</h2>
             {% for audio in object.audios.all %}
-                <div class="card mb-5">
-                    <div class="card-header">
-                        {{ audio.name }}
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item list-group-item-action">
-                            <div class="shikwasa-player-app" data-src="{{ audio.audio.url }}" data-title="{{ audio.name }}"></div>
-                        </li>
-                        {% if audio.transcript %}
-                            <li class="list-group-item list-group-item-action">
-                                <div class="fw-bold">Transcripts</div>
-                                <div class="resource_transcripts">
-                                    {{ audio.transcript|safe }}
-                                </div>
-                            </li>
+                <div class="audio-transcript-player-app" data-url="{{ audio.audio.url }}" data-title="{{ audio.name }}" data-transcripts="{{ audio.transcript|escape }}"></div>
+            {% endfor %}
+        {% endif %}
+
+        {% if object.get_unique_person_contributors|length > 0 %}
+            {% for person in object.get_unique_person_contributors %}
+                <div class="card mb-3" id="person_{{ person.id }}">
+                    <div class="row g-0">
+                        {% if person.image and person.thumbnail %}
+                        <div class="col-md-3 image-app" data-image="{{ person.image.url }}" data-thumbnail="{{ person.thumbnail.url }}" data-label="{{ person.fullname|escape }}" data-class="img-fluid rounded-start object-fit-cover">
+                            {% comment %} <img src="{{ person.thumbnail.url }}" class="" alt="{{ person.fullname|escape }}"> {% endcomment %}
+                        </div>
                         {% endif %}
-                    </ul>
+                        <div class="{% if person.thumbnail %}col-md-9{% endif %}">
+                            <div class="card-body">
+                                <figure>
+                                    <blockquote class="blockquote">
+                                        <h2 class="h1 card-title">{{ person.fullname }}</h2>
+                                        {% for alternative_name in person.alternative_names %}
+                                            <figcaption class="blockquote-footer">{{ alternative_name }}</figcaption>
+                                        {% endfor %}
+                                    </blockquote>
+                                </figure>
+                                <div class="card-text mt-3">{{ person.bio|safe }}</div>
+                                {% if person.links|length > 0 %}
+                                <div class="card-text mt-3">
+                                    <div class="fw-bold">Links</div>
+                                    {% for link in person.links %}
+                                        <a target="_blank" href="{{ link }}">{{ link }}</a><br />
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         {% endif %}
 
         <div class="card mb-5">
-            <div class="card-header">Resource Details</div>
+            <div class="card-header">Details</div>
             <ul class="list-group list-group-flush">
                 {% if object.locale %}
                     <li class="list-group-item list-group-item-action">
@@ -112,79 +129,7 @@
 
         {% if object.images.all|length > 0 %}
             <h2 class="h3">Images</h2>
-            <div class="row row-cols-1 row-cols-md-6 g-4 mb-5">
-                {% for image in object.images.all %}
-                    <div class="col">
-                        <figure class="figure">
-                            <img src="{{ image.thumbnail.url }}" class="figure-img img-fluid rounded" alt="{{ image.name|escape }}">
-                            <figcaption class="figure-caption text-center">{{ image.name}} </figcaption>
-                        </figure>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-
-        {% if object.editions.all|length > 0 %}
-        <h2 class="h3">Editions</h2>
-            {% for edition in object.editions.all %}
-                <div class="card mb-5">
-                    <div class="card-header d-flex justify-content-between align-items-start">
-                        {{ edition.name }}
-                        {% if edition.date %}
-                            <span class="badge text-bg-primary rounded-pill">{{ edition.date }}</span>
-                        {% endif %}
-                    </div>
-                    {% if edition.get_contributors|length > 0 %}
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-action">
-                                <div class="fw-bold">Contributors</div>
-                                {% for contributor in edition.get_contributors %}
-                                    {% include "_includes/contributor.html" with contributor=contributor %}
-                                {% endfor %}
-                            </li>
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% if object.occurrences.all|length > 0 %}
-        <h2 class="h3">Special Occurrences</h2>
-
-            {% for occurrence in object.occurrences.all %}
-                <div class="card mb-5">
-                    <div class="card-header d-flex justify-content-between align-items-start">
-                        {{ occurrence.location }}
-                        {% if occurrence.date %}
-                            <span class="badge text-bg-primary rounded-pill">
-                                {{ occurrence.date }}
-                                {% if occurrence.date_current %}
-                                    - now
-                                {% elif occurrence.date_end %}
-                                    - {{ occurrence.date_end }}
-                                {% endif %}
-                            </span>
-                        {% endif %}
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        {% if occurrence.address %}
-                            <li class="list-group-item list-group-item-action">
-                                <div class="fw-bold">Address</div>
-                                {{ occurrence.address }}
-                            </li>
-                        {% endif %}
-                        {% if edition.get_contributors|length > 0 %}
-                            <li class="list-group-item list-group-item-action">
-                                <div class="fw-bold">Contributors</div>
-                                {% for contributor in edition.get_contributors %}
-                                    {% include "_includes/contributor.html" with contributor=contributor %}
-                                {% endfor %}
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            {% endfor %}
+            <div class="image-gallery-app" data-images-json="{{ images_json|escape }}"></div>
         {% endif %}
     </div>
 {% endblock %}

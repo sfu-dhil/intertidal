@@ -1,13 +1,12 @@
 <script setup>
 import { useTemplateRef, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useResourceFilterStore } from '../stores/resources.js'
+import { useResourcesFilterStore } from '../stores/display.js'
 import { useElementBounding } from '@vueuse/core'
 
-const resourceFilterStore = useResourceFilterStore()
 const {
   selectedKey,
-} = storeToRefs(resourceFilterStore)
+} = storeToRefs(useResourcesFilterStore())
 
 const props = defineProps({
   contributor: {
@@ -36,7 +35,7 @@ watch(selectedKey, (newValue, oldValue) => {
 const fontSize = computed(() => {
   return 1.0 + Math.min((props.contributor.rank-1)/8, 0.5)
 })
-const updateSelected = () => props.contributor.key.startsWith('person_') ? useResourceFilterStore().selectPerson(props.contributor.id) : useResourceFilterStore().selectOrganization(props.contributor.id)
+const updateSelected = () => props.contributor.key.startsWith('person_') ? useResourcesFilterStore().selectPerson(props.contributor.id) : useResourcesFilterStore().selectOrganization(props.contributor.id)
 
 const updateCoordinates = () => {
   if (top.value + height.value >= 0 && top.value <= window.innerHeight) {
@@ -54,24 +53,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <a ref="itemEl" v-motion-slide-visible-once-left
-    class="nav-link me-auto px-0 text-truncate" role="button"
-    :class="{
-      'active': contributor.active,
-      'fw-bold': contributor.active,
-      'text-decoration-underline': contributor.active,
-      'text-light-emphasis': contributor.active,
-      'text-light': !contributor.active,
-    }"
-    :style="{ 'font-size': `${fontSize}em` }"
-    @click="updateSelected"
-    :title="contributor.label"
-  >{{ contributor.label }}</a>
+  <li class="nav-item">
+    <a ref="itemEl" v-motion-slide-left
+      class="nav-link me-auto px-0 text-truncate" role="button"
+      :class="{
+        'active': contributor.active,
+        'fw-bold': contributor.active,
+        'text-decoration-underline': contributor.active,
+        'text-light-emphasis': contributor.active,
+        'text-light': !contributor.active,
+      }"
+      :style="{ 'font-size': `${fontSize}em` }"
+      @click="updateSelected"
+      :title="contributor.label"
+    >{{ contributor.label }}</a>
+  </li>
 </template>
 
 <style scoped>
-a {
-  width: fit-content;
-  max-width: 260px;
+li {
+  width: 300px;
+  a {
+    width: fit-content;
+    max-width: 300px;
+  }
 }
 </style>

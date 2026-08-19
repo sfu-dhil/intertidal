@@ -17,13 +17,13 @@
         {% endblock %}
     </head>
     <body class="d-flex flex-column h-100">
-        <main class="flex-grow-1 py-5 z-1 position-relative bg-transparent">
+        <main class="flex-grow-1 py-5 z-2 position-relative bg-transparent">
             {% bootstrap_messages %}
 
             {% block content %}
             {% endblock %}
         </main>
-        <footer class="py-4 flex-shrink-0 z-2 position-relative bg-transparent">
+        <footer class="py-4 flex-shrink-0 z-3 position-relative bg-transparent">
             <div class="container px-5">
                 <hr />
                 <div class="row align-items-center justify-content-between flex-column flex-sm-row">
@@ -46,10 +46,12 @@
             {% if backdrop_video_src or backdrop_image_src %}
                 <div id="backdrop-media-app" class="position-fixed top-0 bottom-0 start-0 end-0 z-0 bg-secondary-subtle" data-video-src="{{ backdrop_video_src }}" data-image-src="{{ backdrop_image_src }}"></div>
             {% else %}
-                <div class="position-absolute top-0 bottom-0 start-0 end-0 z-0 bg-secondary-subtle"></div>
+                <div class="position-fixed top-0 bottom-0 start-0 end-0 z-1 bg-secondary-subtle"></div>
             {% endif %}
         {% endblock %}
-
+        <div id="info-modal-app"></div>
+        <div id="image-model-app"></div>
+        <div id="image-gallery-model-app"></div>
         {% block javascript %}
         {% endblock %}
     </body>

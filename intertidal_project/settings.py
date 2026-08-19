@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'health_check',
     'django_select2',
     'django_cleanup.apps.CleanupConfig',
+    'rest_framework',
     'django_vite',
     'django_bootstrap5',
 ]
@@ -113,7 +114,6 @@ ONE_YEAR = ONE_DAY * 365
 CACHE_SECONDS = 1 if DEBUG else env('CACHE_SECONDS', default=(ONE_MINUTE*15)) # 1 second if debugging else default 15 minutes
 
 WSGI_APPLICATION = 'intertidal_project.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -224,6 +224,7 @@ TINYMCE_DEFAULT_CONFIG = {
     'quickbars_insert_toolbar': False,
     'quickbars_selection_toolbar': 'bold italic underline strikethrough | styles | fontsize | forecolor | blockquote',
     'contextmenu': 'undo redo | link image | inserttable | cell row column deletetable',
+    'image_class_list': [{ 'title': 'Responsive Image', 'value': 'img-fluid' }],
     'image_caption': True,
     'relative_urls': False,
     'allow_script_urls': True,
@@ -232,4 +233,13 @@ TINYMCE_DEFAULT_CONFIG = {
 # Content Security Policy
 SECURE_CSP = {
     # "default-src": [CSP.SELF],
+}
+
+# django rest framework
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+    ]
 }

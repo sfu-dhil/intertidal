@@ -1,7 +1,8 @@
 <script setup>
 import { useTemplateRef, watch, onUnmounted, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useResourceStore, useResourceFilterStore } from '../stores/resources.js'
+import { useResourcesFilterStore } from '../stores/display.js'
+import { useResourcesStore } from '../stores/data.js'
 import { watchDebounced } from '@vueuse/core'
 
 const entityHoverKey = defineModel('entityHoverKey', { default: null })
@@ -9,10 +10,12 @@ const resourceCoordinateMap = defineModel('resourceCoordinateMap', { default: ne
 const collaboratorCoordinateMap = defineModel('collaboratorCoordinateMap', { default: new Map() })
 const categoryCoordinateMap = defineModel('categoryCoordinateMap', { default: new Map() })
 
-const resourceFilterStore = useResourceFilterStore()
 const {
   selectedKey,
-} = storeToRefs(resourceFilterStore)
+} = storeToRefs(useResourcesFilterStore())
+const {
+  objectMap: resourceObjectMap
+} = storeToRefs(useResourcesStore())
 
 const canvasWrapperEl = useTemplateRef('canvasWrapperEl')
 const canvasEl = useTemplateRef('canvasEl')
@@ -26,14 +29,14 @@ const redraw = () => {
         // clear canvas
         ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height)
         for (const [resourceId, resourceCoordinates] of resourceCoordinateMap.value) {
-          const resource = useResourceStore().getResource(resourceId)
+          const resource = resourceObjectMap.value.get(resourceId)
           const {left: resourceLeft, right: resourceRight, y: resourceY} = resourceCoordinates
 
           for (const [category, categoryCoordinates] of categoryCoordinateMap.value) {
             const categoryKey = `category_${category}`
             const {left: categoryLeft, y: categoryY} = categoryCoordinates
-            if (resource.category_set.has(category)) {
-              const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === categoryKey || selectedKey.value === categoryKey
+            if (resource.categories.includes(category)) {
+              const isHighlighted = entityHoverKey.value === `resource_${resource.id}` || entityHoverKey.value === categoryKey || selectedKey.value === categoryKey
               ctx.lineWidth = isHighlighted ? 2 : 1
               ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
               ctx.fillStyle = 'grey'
@@ -68,8 +71,8 @@ const redraw = () => {
             const {right: collaboratorRight, y: collaboratorY} = collaboratorCoordinates
             const personId = entityKey.startsWith('person_') ? parseInt(entityKey.slice('person_'.length)) : null
             const organizationId = entityKey.startsWith('organization_') ? parseInt(entityKey.slice('organization_'.length)) : null
-            if ((personId && resource.person_id_set.has(personId)) || (organizationId && resource.organization_id_set.has(organizationId))) {
-              const isHighlighted = entityHoverKey.value === resource.key || entityHoverKey.value === entityKey || selectedKey.value === entityKey
+            if ((personId && resource.person_ids.includes(personId)) || (organizationId && resource.organization_ids.includes(organizationId))) {
+              const isHighlighted = entityHoverKey.value === `resource_${resource.id}` || entityHoverKey.value === entityKey || selectedKey.value === entityKey
               ctx.lineWidth = isHighlighted ? 2 : 1
               ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255, 0.8)' : 'rgba(200,200,200, 0.3)'
               ctx.beginPath()

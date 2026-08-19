@@ -9,6 +9,12 @@ import VideoPlayer from '@videojs-player/vue'
 import ResourcesApp from './ResourcesApp.vue'
 import MapFilterApp from './MapFilterApp.vue'
 import AudioPlayerApp from './AudioPlayerApp.vue'
+import AudioTranscriptPlayerApp from './AudioTranscriptPlayerApp.vue'
+import ImageApp from './ImageApp.vue'
+import ImageModalApp from './ImageModalApp.vue'
+import ImageGalleryApp from './ImageGalleryApp.vue'
+import ImageGalleryModalApp from './ImageGalleryModalApp.vue'
+import InfoModalApp from './InfoModalApp.vue'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -34,12 +40,7 @@ ready(() => {
   })
 
   document.querySelectorAll('#resources-app').forEach((mountEl) => {
-    const app = createApp(ResourcesApp, {
-      resources: mountEl.dataset.resourcesJson ? JSON.parse(mountEl.dataset.resourcesJson) : [],
-      people: mountEl.dataset.peopleJson ? JSON.parse(mountEl.dataset.peopleJson) : [],
-      organizations: mountEl.dataset.organizationsJson ? JSON.parse(mountEl.dataset.organizationsJson) : [],
-      marcRelators: mountEl.dataset.marcRelatorsJson ? JSON.parse(mountEl.dataset.marcRelatorsJson) : [],
-    })
+    const app = createApp(ResourcesApp, { ...mountEl.dataset })
     app.use(pinia)
     app.use(MotionPlugin)
     app.component('Multiselect', Multiselect)
@@ -57,6 +58,45 @@ ready(() => {
     const app = createApp(AudioPlayerApp, {
       playlist: mountEl.dataset.playlistJson ? JSON.parse(mountEl.dataset.playlistJson) : [],
     })
+    app.use(pinia)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('.audio-transcript-player-app').forEach((mountEl) => {
+    const app = createApp(AudioTranscriptPlayerApp, { ...mountEl.dataset })
+    app.use(pinia)
+    app.config.idPrefix = 'audio-transcript-player-app'
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('.image-app').forEach((mountEl) => {
+    const app = createApp(ImageApp, { ...mountEl.dataset })
+    app.use(pinia)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('#image-model-app').forEach((mountEl) => {
+    const app = createApp(ImageModalApp, { ...mountEl.dataset })
+    app.use(pinia)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('.image-gallery-app').forEach((mountEl) => {
+    const app = createApp(ImageGalleryApp, {
+      images: mountEl.dataset.imagesJson ? JSON.parse(mountEl.dataset.imagesJson) : [],
+    })
+    app.use(pinia)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('#image-gallery-model-app').forEach((mountEl) => {
+    const app = createApp(ImageGalleryModalApp, { ...mountEl.dataset })
+    app.use(pinia)
+    app.mount(mountEl)
+  })
+
+  document.querySelectorAll('#info-modal-app').forEach((mountEl) => {
+    const app = createApp(InfoModalApp)
     app.use(pinia)
     app.mount(mountEl)
   })

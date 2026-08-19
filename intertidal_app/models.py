@@ -223,6 +223,7 @@ class Resource(models.Model):
 
     class Meta:
         db_table = 'intertidal_resource'
+        ordering = ['name']
 
     def date_str(self):
         if not self.date:
@@ -278,6 +279,12 @@ class Resource(models.Model):
 
         return sorted(results, key=lambda item: item['label'])
 
+    def get_unique_person_contributors(self):
+        people = {
+            person_responsibility_statement.person.id: person_responsibility_statement.person for person_responsibility_statement in self.person_responsibility_statements.all()
+        }
+        return sorted(people.values(), key=lambda person: person.fullname)
+
 class Edition(models.Model):
     # fields
     name = models.CharField(verbose_name='Name/Title', blank=True)
@@ -306,6 +313,7 @@ class Edition(models.Model):
 
     class Meta:
         db_table = 'intertidal_edition'
+        ordering = ['date', 'id']
 
     def __str__(self):
         return f"{self.name} ({self.date})" if self.date else self.name
@@ -362,7 +370,8 @@ class Occurrence(models.Model):
 
     class Meta:
         db_table = 'intertidal_occurrence'
-        verbose_name = "Special Occurrence"
+        verbose_name = 'Special Occurrence'
+        ordering = ['date', 'id']
 
     def date_str(self):
         if not self.date:
@@ -420,6 +429,7 @@ class ResourceAudio(models.Model):
 
     class Meta:
         db_table = 'intertidal_resourceaudio'
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -450,6 +460,7 @@ class ResourceImage(models.Model):
 
     class Meta:
         db_table = 'intertidal_resourceimage'
+        ordering = ['id']
 
     def __str__(self):
         return self.name

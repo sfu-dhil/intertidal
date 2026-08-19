@@ -2,13 +2,12 @@
 import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMouseInElement } from '@vueuse/core'
-import { useResourceFilterStore } from './stores/resources.js'
+import { useResourcesFilterStore } from './stores/display.js'
 
-const resourceFilterStore = useResourceFilterStore()
 const {
   selectedType,
   selectedValue,
-} = storeToRefs(resourceFilterStore)
+} = storeToRefs(useResourcesFilterStore())
 
 const vancouverMarkerCircleRef = ref(null)
 const hongKongMarkerCircleRef = ref(null)
@@ -36,7 +35,7 @@ const { isOutside: isOutsideSingaporeMarker } = useMouseInElement(singaporeMarke
           'border-primary': isVancouverSelected && isOutsideVancouverMarker,
           'border-info': !isOutsideVancouverMarker
         }"
-        @click="useResourceFilterStore().selectLocale('VANCOUVER')"
+        @click="useResourcesFilterStore().selectLocale('VANCOUVER')"
       >
         <img :src="websiteOrigin+'/static/images/watercolors/vancouver.png'" class="rounded-circle m-0 p-0 watercolor-map-icon-img" alt="Vancouver Watercolor Marker" />
         <span class="position-absolute z-2 top-100 start-50 translate-middle mt-1"
@@ -60,7 +59,7 @@ const { isOutside: isOutsideSingaporeMarker } = useMouseInElement(singaporeMarke
           'border-primary': isHongKongSelected && isOutsideHongKongMarker,
           'border-info': !isOutsideHongKongMarker
         }"
-        @click="useResourceFilterStore().selectLocale('HONG_KONG')"
+        @click="useResourcesFilterStore().selectLocale('HONG_KONG')"
       >
         <img :src="websiteOrigin+'/static/images/watercolors/hong_kong.png'" class="rounded-circle m-0 p-0 watercolor-map-icon-img" alt="Hong Kong Watercolor Marker" />
         <span class="position-absolute z-2 top-100 start-50 translate-middle mt-1"
@@ -84,7 +83,7 @@ const { isOutside: isOutsideSingaporeMarker } = useMouseInElement(singaporeMarke
           'border-primary': isSingaporeSelected && isOutsideSingaporeMarker,
           'border-info': !isOutsideSingaporeMarker
         }"
-        @click="useResourceFilterStore().selectLocale('SINGAPORE')"
+        @click="useResourcesFilterStore().selectLocale('SINGAPORE')"
       >
         <img :src="websiteOrigin+'/static/images/watercolors/singapore.png'" class="rounded-circle m-0 p-0 watercolor-map-icon-img" alt="Singapore Watercolor Marker" />
         <span class="position-absolute z-2 top-100 start-50 translate-middle mt-1"

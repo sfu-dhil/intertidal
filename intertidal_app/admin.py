@@ -134,8 +134,8 @@ class ResourceAudioInlineAdmin(NestedStackedInline):
                 resource_images = ResourceImage.objects.filter(resource_id=object_id).all()
                 resource_image_links = []
                 for resource_image in resource_images:
-                    resource_image_links.append({'title': resource_image.name, 'value': resource_image.image.url})
-                    resource_image_links.append({'title': f'{resource_image.name} Thumbnail', 'value': resource_image.thumbnail.url})
+                    resource_image_links.append({'title': f'{resource_image.name if resource_image.name else resource_image.pk}', 'value': resource_image.image.url})
+                    resource_image_links.append({'title': f'{resource_image.name if resource_image.name else resource_image.pk} Thumbnail', 'value': resource_image.thumbnail.url})
                 mce_attrs['image_list'] = resource_image_links
             kwargs['widget'] = TinyMCE(mce_attrs=mce_attrs)
         return super().formfield_for_dbfield(db_field, request, **kwargs)
