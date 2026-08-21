@@ -1,4 +1,4 @@
-name: Cleanup Old Untagged ghcr.io Images
+name: Cleanup Old ghcr.io Images
 
 on:
   # Runs every Saturday@3:00am
@@ -15,9 +15,12 @@ jobs:
     permissions:
       packages: write
     steps:
-    - name: Delete untagged images older than 90 days
+    - name: Delete untagged/partial/orphaned images older than 30 days
       uses: dataaxiom/ghcr-cleanup-action@v1
       with:
         delete-untagged: true
-        older-than: 90 days
+        delete-ghost-images: true
+        delete-partial-images: true
+        delete-orphaned-images: true
+        older-than: 30 days
         validate: true

@@ -29,7 +29,7 @@ const playNextOnEnd = (currentIndex) => {
       <div class="flex-grow-1 mx-2">
         <WaveformPlayer
           ref="waveformPlayerRefs"
-          :url="item.url" :title="item.title"
+          :url="item.url" :title="item.title" :artist="item.artist"
           preload="metadata"
           waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
           :singlePlay="true" :enableMediaSession="true" :showControls="true"

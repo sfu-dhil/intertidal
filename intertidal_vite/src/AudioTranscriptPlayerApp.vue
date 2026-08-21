@@ -12,6 +12,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  artist: {
+    type: String,
+    required: false,
+  },
   transcripts: {
     type: String,
     required: false,
@@ -46,7 +50,7 @@ const processedTranscripts = computed(() => {
       <h2 class="card-title">{{ title }}</h2>
       <WaveformPlayer
         ref="waveformPlayerRef"
-        :url="url" :title="title"
+        :url="url" :title="title" :artist="artist"
         preload="metadata"
         waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
         :singlePlay="true" :enableMediaSession="true" :showControls="true"

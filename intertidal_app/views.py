@@ -22,8 +22,9 @@ def home(request):
         .all()
 
     playlist = [ambient_soundscape] + [{
-        'url': resource.audios.first().audio.url,
-        'title': resource.name,
+        'url': resource.audios.first().audio_snippet.url if resource.audios.first().audio_snippet else resource.audios.first().audio.url,
+        'title': resource.audios.first().name,
+        'artist': resource.name,
         'resource_url': reverse('resource-details', kwargs={'pk': resource.pk}),
     } for resource in roundtable_interview_resources]
 

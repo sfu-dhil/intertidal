@@ -13,7 +13,7 @@
 
         {% if object.audios.all|length > 0 %}
             {% for audio in object.audios.all %}
-                <div class="audio-transcript-player-app" data-url="{{ audio.audio.url }}" data-title="{{ audio.name }}" data-transcripts="{{ audio.transcript|escape }}"></div>
+                <div class="audio-transcript-player-app" data-url="{{ audio.audio.url }}" data-title="{{ audio.name|escape }}" data-artist="{{ object.name|escape }}" data-transcripts="{{ audio.transcript|escape }}"></div>
             {% endfor %}
         {% endif %}
 

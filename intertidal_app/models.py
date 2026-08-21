@@ -414,6 +414,13 @@ class ResourceAudio(models.Model):
         blank=True,
         help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), AAC (.m4a), WAV (.wav), or Ogg (.ogg) are recommended.'),
     )
+    audio_snippet = models.FileField(
+        verbose_name='Audio Snippet',
+        upload_to='audio/',
+        null=True,
+        blank=True,
+        help_text=mark_safe('Please use <u><a href="https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers" target="_blank">standard web audio types</a></u>. MP3 (.mp3), AAC (.m4a), WAV (.wav), or Ogg (.ogg) are recommended.'),
+    )
     transcript = models.TextField(blank=True, verbose_name='Transcript')
 
     # write tracking fields

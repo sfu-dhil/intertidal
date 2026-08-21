@@ -107,8 +107,8 @@ class ResourceImageInlineAdmin(NestedTabularInline):
     _thumbnail_image_tag.short_description = 'Image Preview'
 
 class ResourceAudioInlineAdmin(NestedStackedInline):
-    fields = [('_audio_tag', 'name', 'audio'), 'transcript']
-    readonly_fields = ['_audio_tag']
+    fields = [('_audio_tag', 'name', 'audio'), ('_audio_snippet_tag', 'audio_snippet'), 'transcript']
+    readonly_fields = ['_audio_tag', '_audio_snippet_tag']
     ordering = ['id']
     model = ResourceAudio
     extra = 0
@@ -116,6 +116,9 @@ class ResourceAudioInlineAdmin(NestedStackedInline):
     def _audio_tag(self, obj):
         return mark_safe(f'<audio src="{obj.audio.url}" controls />') if obj.audio else ''
     _audio_tag.short_description = 'Audio Preview'
+    def _audio_snippet_tag(self, obj):
+        return mark_safe(f'<audio src="{obj.audio_snippet.url}" controls />') if obj.audio_snippet else ''
+    _audio_snippet_tag.short_description = 'Audio Snippet Preview'
 
     formfield_overrides = {
         TextField: {'widget': TinyMCE},
