@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, useId } from 'vue'
+import { ref, computed, useId, onMounted } from 'vue'
 import { WaveformPlayer } from '@arraypress/waveform-player-vue'
 import { WaveformPlayer as WaveformPlayerCore } from '@arraypress/waveform-player'
 
@@ -23,6 +23,7 @@ const props = defineProps({
 })
 
 const waveformPlayerRef = ref(null)
+const preload = ref('none')
 
 const seekFunctionName = `waveform_player_seek_to_${useId()}`.replaceAll('-','_')
 console.log('seekFunctionName', seekFunctionName)
@@ -42,6 +43,10 @@ const processedTranscripts = computed(() => {
     return `<button class="btn btn-link p-0" onclick="${seekFunctionName}(${seconds})">${p1}:${p2}:${p3}</button>`
   })
 })
+onMounted(() => {
+  // add a small delay to metadata preloading
+  setTimeout(() => preload.value = 'metadata', 100)
+})
 </script>
 
 <template>
@@ -51,8 +56,8 @@ const processedTranscripts = computed(() => {
       <WaveformPlayer
         ref="waveformPlayerRef"
         :url="url" :title="title" :artist="artist"
-        preload="metadata"
-        waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
+        :preload="preload"
+        :waveform="[1]" waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
         :singlePlay="true" :enableMediaSession="true" :showControls="true"
         :showInfo="true" :showTime="true" :showHoverTime="true" :showPlaybackSpeed="true"
       />

@@ -10,6 +10,7 @@ const props = defineProps({
 })
 
 const waveformPlayerRefs = ref([])
+const preload = ref('none')
 
 const playNextOnEnd = (currentIndex) => {
   if (waveformPlayerRefs.value?.length > currentIndex + 1) {
@@ -18,6 +19,10 @@ const playNextOnEnd = (currentIndex) => {
     nextPlayer.play()
   }
 }
+onMounted(() => {
+  // add a small delay to metadata preloading
+  setTimeout(() => preload.value = 'metadata', 100)
+})
 </script>
 
 <template>
@@ -30,8 +35,8 @@ const playNextOnEnd = (currentIndex) => {
         <WaveformPlayer
           ref="waveformPlayerRefs"
           :url="item.url" :title="item.title" :artist="item.artist"
-          preload="metadata"
-          waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
+          :preload="preload"
+          :waveform="[1]" waveformStyle="seekbar" layout="default" colorPreset="dark" buttonStyle="circle"
           :singlePlay="true" :enableMediaSession="true" :showControls="true"
           :showInfo="true" :showTime="true" :showHoverTime="true"
           @end="() => playNextOnEnd(itemIndex)"
