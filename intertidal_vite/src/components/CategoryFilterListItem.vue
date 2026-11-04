@@ -75,6 +75,7 @@ onUnmounted(() => {
 <style scoped>
 li {
   width: 300px;
+  overflow:hidden;
   a {
     width: fit-content;
     max-width: 300px;
