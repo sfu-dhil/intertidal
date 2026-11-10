@@ -213,13 +213,13 @@ ffmpeg -i $WORKING_DIR/Beach_stabilised_fade.MOV \
     $BACKDROP_DIR/master.mpd
 ```
 
-## Audio files (convert to ogg)
+## Audio files (convert to m4a)
 
 
 ```shell
 # setup some env variables (makes it a bit easier) and directories
 export STATIC_AUDIO_DIR=".data/static-assets/audio"
 
-# generate ogg files
+# generate m4a files
 ffmpeg -i $STATIC_AUDIO_DIR/intertidal_draft_ambient_soundscape.wav -acodec aac $STATIC_AUDIO_DIR/intertidal_draft_ambient_soundscape.m4a
 ```

@@ -10,7 +10,7 @@ from .models import Resource
 
 def home(request):
     ambient_soundscape = {
-        'url': static('audio/intertidal_draft_ambient_soundscape.ogg'),
+        'url': static('audio/intertidal_draft_ambient_soundscape.m4a'),
         'title': 'Ambient Soundscape',
     }
     roundtable_interview_resources = Resource.objects \
